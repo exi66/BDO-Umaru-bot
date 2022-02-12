@@ -1,0 +1,6 @@
+{
+    "token":  "",
+    "prefix": "!",
+    "coupons_folder": "./data/coupons.json",
+    "servers_configs_folder": "./data/servers.json"
+}
