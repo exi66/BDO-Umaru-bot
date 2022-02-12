@@ -14,8 +14,9 @@ module.exports = {
             return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
         if (!configurations_list.find(server => server.guild == message.guild.id))
             return message.reply("конфигурация сервера отсутствует, использование не возможно!").then(m => m.delete({ timeout: 10000 }));                    
-        if (!configurations_list.find(server => server.guild == message.guild.id).premium)
-            return message.reply("сервер не премиум, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
+        //if (!configurations_list.find(server => server.guild == message.guild.id).premium)
+            //return message.reply("сервер не премиум, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
+	//cheak, can server use this command or not. You can delete this, if want use bot only for yourself.
         if (args.length <= 0) 
             return message.reply("отсутствуют аргументы!").then(m => m.delete({ timeout: 10000 }));
         let filter = m => m.author.id === message.author.id;
