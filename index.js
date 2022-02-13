@@ -90,30 +90,20 @@ setInterval(function() {
 				//console.log(body);
 				if (body !== "" && body != null) {	
 					let div = body.match(/<([^\s]+).*?id="text-15".*?>(.+?)<\/\1>/g);
-					let search = div[0].match(/(<p>|<strong>)([^<]*)(<\/p>|<\/strong>)/g);
-					let first, last;
-					for (let i = 0; i < search.length; i++) {
-						if (search[i] == "<strong>Промокоды BDO (КУПОНЫ)</strong>") first = i+1;
-						if (search[i] == "<strong>Как использовать промокод BDO (жми)</strong>") last = i;
-					}
-					if (!last || !first) return print_e("[ERROR/Orbit_games] div with coupones not found, need to edit regex");
+					let search = div[0].match(/\(?[a-zA-Z0-9]{4}\)?-?[a-zA-Z0-9]{4}?-?[a-zA-Z0-9]{4}-?[a-zA-Z0-9]{4}/gm);
+					if (!search) return print_e("[ERROR/coupones.js] div with coupones not found, need to edit regex");
 					let all_coupones_list = [], new_coupones_list = [];
-					for (let i = first; i<last; i+=2) {
-						let loc_coupon = {
-							"date" : search[i].replace(/<[^>]*>?/gm, ""),
-							"code" : search[i+1].replace(/<[^>]*>?/gm, "")
-						}
-						all_coupones_list.push(loc_coupon);
-						if (!containsCupons(loc_coupon, coupons_list)) new_coupones_list.push(loc_coupon);
+					for (let c of search) {
+						if (!all_coupones_list.includes(c.toUpperCase())) all_coupones_list.push(c.toUpperCase());
+						if (!coupons_list.includes(c.toUpperCase())) new_coupones_list.push(c.toUpperCase());
 					}							
 					if (new_coupones_list.length > 0) {
 						fs.writeFile(config.coupons_folder, JSON.stringify(all_coupones_list, null, 4), function (err) {
 							if (err) return print_e("[ERROR/Orbit_games]: Cannot save all coupones, "+err.message);
 						});
-						let codes = "", times = "";
+						let codes = "";
 						for (let c of new_coupones_list) {
-							codes += c.code+"\n";
-							times += c.date+"\n";
+							codes += "`"+c+"`\n";
 						}
 						for (let local_guilds of configurations_list) {
 							let em = {
@@ -122,10 +112,7 @@ setInterval(function() {
 									color: 15105570,
 									title: "Купоны",
 									timestamp: new Date(),
-									fields: [
-										{ name: "Код", value: codes, inline: true},
-										{ name: "Время действия", value: times, inline: true}												
-									]
+									description: codes
 								}
 							};							
 							try {
