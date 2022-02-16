@@ -1,4 +1,4 @@
-# BDO-Umaru-bot
+# bdo-umaru-bot
 ## Discord.js bot for scraping black desert market queue and coupons
   Сurrently dev and support only russian region
 
