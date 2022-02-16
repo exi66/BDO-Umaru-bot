@@ -131,12 +131,12 @@ module.exports = {
                     let role = local_message.mentions.roles.first() || message.guild.roles.cache.find(role => role.id === local_message);
                     if (!role) return message.channel.send("Не удалось распознать роль!");
                     let c = configurations_list.find(server => server.guild == message.guild.id);
-                    for (let e of c.items) {
-                        if (e.role == role.id) {
-                            let index = c.items.indexOf(e);
-                            if (index !== -1) {
-                                c.items.splice(index, 1);
-                            }
+                    for (let i = 0; i < c.items.length; i++) {
+                        if (c.items[i].role == role.id) {
+                            c.items.splice(i, 1);
+                            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
+                            	if (err) return print_e("[ERROR/track.js] " + err.message);
+                            });							
                             return message.channel.send("Удалено!");
                         }
                     }
