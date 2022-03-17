@@ -16,14 +16,17 @@ client.categories = fs.readdirSync("./commands/");
 client.on("ready", () => {
     print_e(`${client.user.username} is now online!`);
 	client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
+	checkAndRemove();
 });
 client.on("guildCreate", guild => {
     print_e(`Joined a new guild: ${guild.name}`);
 	client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
+	checkAndRemove();
 })
 client.on("guildDelete", guild => {
     print_e(`Left a guild: ${guild.name}`);
 	client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
+	checkAndRemove();
 })
 client.on("message", async message => {
     if (message.author.bot) return;
@@ -42,8 +45,22 @@ client.on("message", async message => {
     if (command) command.run(client, message, args, config);
 });
 client.login(config.token);
-let configurations_list = [];
-let coupons_list = [];
+var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder)) || [];
+var coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder)) || [];
+
+function checkAndRemove() {
+	if (configurations_list.length < 1) return;
+	let guilds = client.guilds.cache.map(guild => guild.id);
+	for (let i = 0; i < configurations_list.length; i++) {
+		if (!guilds.includes(configurations_list[i].guild)) {
+			print_e("[checkAndRemove] found removed guild: "+configurations_list[i].guild);
+			configurations_list.splice(i, 1);
+		}
+	}
+	fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
+		if (err) return print_e(err);
+	});	
+}
 
 //main cycle
 setInterval(function() {
