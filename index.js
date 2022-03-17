@@ -13,24 +13,19 @@ client.categories = fs.readdirSync("./commands/");
 ["command"].forEach(handler => {
     require(`./handlers/${handler}`)(client);
 });
-
 client.on("ready", () => {
     print_e(`${client.user.username} is now online!`);
 	client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
 });
-
 client.on("guildCreate", guild => {
     print_e(`Joined a new guild: ${guild.name}`);
 	client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
 })
-
 client.on("guildDelete", guild => {
     print_e(`Left a guild: ${guild.name}`);
 	client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
 })
-
 client.on("message", async message => {
-
     if (message.author.bot) return;
     if (!message.guild) return;
     if (!message.content.startsWith(config.prefix)) return;
@@ -46,143 +41,125 @@ client.on("message", async message => {
 
     if (command) command.run(client, message, args, config);
 });
-
 client.login(config.token);
-
 let configurations_list = [];
 let coupons_list = [];
-fs.readFile(config.servers_configs_folder, (err, data) => {
-	if (err) print_e("[ERROR/Read_servers_configs]" + err.message);
-	configurations_list = JSON.parse(data);
-});	
-fs.readFile(config.coupons_folder, (err, data) => {
-	if (err) print_e("[ERROR/Read_servers_configs]" + err.message);
-	coupons_list = JSON.parse(data);
-});
 
-function containsCupons(obj, list) {
-    for (let i = 0; i < list.length; i++) {
-        if (list[i].code == obj.code) {
-            return true;
-        }
-    }
-    return false;
-}
-
+//main cycle
 setInterval(function() {
 	fs.readFile(config.servers_configs_folder, (err, data) => {
 		if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
 		configurations_list = JSON.parse(data);
-	});	
+	});
 	fs.readFile(config.coupons_folder, (err, data) => {
 		if (err) return print_e("[ERROR/Read_coupons]" + err.message);
 		coupons_list = JSON.parse(data);
 	});		
 	try {
 		if (configurations_list.length > 0) {
-			request({
-				method: "GET",
-				url: "https://orbit-games.com/",
-				headers: {
-					"User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
-				}
-			}).then(body => {
-				//console.log(body);
-				if (body !== "" && body != null) {	
-					let div = body.match(/<([^\s]+).*?id="text-15".*?>(.+?)<\/\1>/g);
-					let search = div[0].match(/\(?[a-zA-Z0-9]{4}\)?-?[a-zA-Z0-9]{4}?-?[a-zA-Z0-9]{4}-?[a-zA-Z0-9]{4}/gm);
-					if (!search) return print_e("[ERROR/coupones.js] div with coupones not found, need to edit regex");
-					let all_coupones_list = [], new_coupones_list = [];
-					for (let c of search) {
-						if (!all_coupones_list.includes(c.toUpperCase())) all_coupones_list.push(c.toUpperCase());
-						if (!coupons_list.includes(c.toUpperCase())) new_coupones_list.push(c.toUpperCase());
-					}							
-					if (new_coupones_list.length > 0) {
-						fs.writeFile(config.coupons_folder, JSON.stringify(all_coupones_list, null, 4), function (err) {
-							if (err) return print_e("[ERROR/Orbit_games]: Cannot save all coupones, "+err.message);
-						});
-						let codes = "";
-						for (let c of new_coupones_list) {
-							codes += "`"+c+"`\n";
-						}
-						for (let local_guilds of configurations_list) {
-							let em = {
-								content: `<@&${local_guilds["coupons-role"]}>`,
-								embed: {
-									color: 15105570,
-									title: "Купоны",
-									timestamp: new Date(),
-									description: codes
-								}
-							};							
-							try {
-								let local_channel = client.channels.cache.get(local_guilds["coupons"]);
-								if (local_channel) local_channel.send(em);
-							} catch (e) {
-								print_e("[ERROR/Orbit_games]: Cannot send new coupones, "+e.message);
-							}
-						}							
+			if (config.coupons) {	
+				request({
+					method: "GET",
+					url: "https://orbit-games.com/",
+					headers: {
+						"User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
 					}
-				}
-			}).catch(function(e) { print_e("[ERROR/Orbit_games]: Request error, "+e.message) });						
-			request({
-				method: "GET",
-				url: "http://veliainn.com/api/market-queue/ru",
-				headers: {
-					"User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
-				}
-			}).then(body => {
-				if (body !== "" && body != null) {
-					let data = JSON.parse(body);
-					let items = data["items"];
-					//let lastupdate = data["lastUpdate"];
-					if (items.length > 0) {
-						for (let local_guilds of configurations_list) {
-							let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
-							for (let local_items of local_guilds["items"]) {
-								for (let item of items) {								
-									for (let local_id of local_items["ids"]) {
-										if (item[0] == local_id && item[1] == local_items["enchant"]) {
+				}).then(body => {
+					//console.log(body);
+					if (body !== "" && body != null) {	
+						let div = body.match(/<([^\s]+).*?id="text-15".*?>(.+?)<\/\1>/g);
+						let search = div[0].match(/\(?[a-zA-Z0-9]{4}\)?-?[a-zA-Z0-9]{4}?-?[a-zA-Z0-9]{4}-?[a-zA-Z0-9]{4}/gm);
+						if (!search) return print_e("[ERROR/coupones.js] div with coupones not found, need to edit regex");
+						let all_coupones_list = [], new_coupones_list = [];
+						for (let c of search) {
+							if (!all_coupones_list.includes(c.toUpperCase())) all_coupones_list.push(c.toUpperCase());
+							if (!coupons_list.includes(c.toUpperCase())) new_coupones_list.push(c.toUpperCase());
+						}							
+						if (new_coupones_list.length > 0) {
+							fs.writeFile(config.coupons_folder, JSON.stringify(all_coupones_list, null, 4), function (err) {
+								if (err) return print_e("[ERROR/Orbit_games]: Cannot save all coupones, "+err.message);
+							});
+							let codes = coupons_list.map(e => "`" + e + "`").join("\n");
+							for (let local_guilds of configurations_list) {						
+								try {
+									let local_channel = client.channels.cache.get(local_guilds["coupons"]);
+									if (local_channel) local_channel.send({
+										content: `<@&${local_guilds["coupons-role"]}>`,
+										embed: {
+											color: 15105570,
+											title: "Купоны",
+											timestamp: new Date(),
+											description: codes
+										}
+									});
+								} catch (e) {
+									print_e("[ERROR/Orbit_games]: Cannot send new coupones, "+e.message);
+								}
+							}							
+						}
+					}
+				}).catch(function(e) { print_e("[ERROR/Orbit_games]: Request error, "+e.message) });
+			}
+			if (config.queue) {					
+				request({
+					method: "GET",
+					url: "http://veliainn.com/api/market-queue/ru",
+					headers: {
+						"User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
+					}
+				}).then(body => {
+					if (body !== "" && body != null) {
+						let data = JSON.parse(body);
+						fs.writeFile(config.queue_folder, JSON.stringify(data, null, 4), function (err) {
+							if (err) return print_e("[ERROR/Queue]: Cannot save queue, "+err.message);
+						});
+						let items = data["items"];
+						//let lastupdate = data["lastUpdate"];
+						if (items.length > 0) {					
+							for (let local_guilds of configurations_list) {
+								let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
+								for (let local_items of local_guilds["items"]) {
+									for (let item of items) {		
+										if(local_items["ids"].includes(item[0].toString()) && item[1] == local_items["enchant"]) {
 											important_items_list.push(item);
 											if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
 											lvls += item[1]+"\n";
 											names += item[4]+"\n";
-											var date = new Date(item[3] * 1000);
-											var hours = date.getHours();
-											var minutes = "0" + date.getMinutes();
-											var seconds = "0" + date.getSeconds();
+											let date = new Date(item[3] * 1000);
+											let hours = date.getHours();
+											let minutes = "0" + date.getMinutes();
+											let seconds = "0" + date.getSeconds();
 											times += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
-										}
-									}										
-								}
-							}
-							if (important_items_list.length > 0) {
-								let em = {
-									content: mentions,
-									embed: {
-										color: 15105570,
-										title: "Очередь аукциона",
-										timestamp: new Date(),
-										fields: [
-											{ name: "lvl", value: lvls, inline: true},
-											{ name: "Название", value: names, inline: true},
-											{ name: "Время", value: times, inline: true}
-										]
+										}										
 									}
-								};							
-								try {
-									let local_channel = client.channels.cache.get(local_guilds["queue"]);
-									if (local_channel) local_channel.send(em);
-								} catch (e) {
-									print_e("[ERROR/Queue]: Cannot send queue, "+e.message);
-								}									
-							}
-						}							
+								}
+								if (important_items_list.length > 0) {						
+									try {
+										let local_channel = client.channels.cache.get(local_guilds["queue"]);
+										if (local_channel) local_channel.send({
+											content: mentions,
+											embed: {
+												color: 15105570,
+												title: "Очередь аукциона",
+												timestamp: new Date(),
+												fields: [
+													{ name: "lvl", value: lvls, inline: true},
+													{ name: "Название", value: names, inline: true},
+													{ name: "Время", value: times, inline: true}
+												]
+											}
+										});
+									} catch (e) {
+										print_e("[ERROR/Queue]: Cannot send queue, "+e.message);
+									}									
+								}
+							}							
+						}
 					}
-				}
-			}).catch(function(e) { print_e("[ERROR/Queue]: Request error, "+e.message); });
+				}).catch(function(e) { print_e("[ERROR/Queue]: Request error, "+e.message); });
+			}
 		}
 	} catch (e) {
 		print_e("[ERROR/App]: General try-catch error, "+e.message);
 	}
-}, 5*60*1000);
+}, config.debug ? 10*1000 : 5*60*1000);
