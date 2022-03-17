@@ -1,6 +1,11 @@
 {
     "token":  "",
-    "prefix": "!",
+    "root": "",
+    "prefix": "!!",
     "coupons_folder": "./data/coupons.json",
-    "servers_configs_folder": "./data/servers.json"
+    "queue_folder": "./data/queue.json",
+    "servers_configs_folder": "./data/servers.json",
+    "debug": false,
+    "coupons": true,
+    "queue": true
 }
