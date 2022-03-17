@@ -16,7 +16,7 @@ module.exports = {
             return message.reply("конфигурация сервера отсутствует, использование не возможно!").then(m => m.delete({ timeout: 10000 }));                    
         //if (!configurations_list.find(server => server.guild == message.guild.id).premium)
             //return message.reply("сервер не премиум, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
-	//cheak, can server use this command or not. You can delete this, if want use bot only for yourself.
+	    //cheak, can server use this command or not. You can delete this, if want use bot only for yourself.
         if (args.length <= 0) 
             return message.reply("отсутствуют аргументы!").then(m => m.delete({ timeout: 10000 }));
         let filter = m => m.author.id === message.author.id;
@@ -99,14 +99,14 @@ module.exports = {
         }
         else if (args[0].toLowerCase() === "list") {
             let c = configurations_list.find(server => server.guild == message.guild.id);
+            if (c.items.length == 0) return message.channel.send("Список отслеживаемых товаров пуст!");
             let roles="", items="", lvls="";
             for (let e of c.items) {
                 items+=e.ids.slice(0, Math.min(5, c.items.length)).join(", ")+"\n";
                 roles+="<@&"+e.role+">\n"; 
                 lvls+=e.enchant+"\n";  
             }
-            let em = {
-                content: `Guild ID = \`${c.guild}\`\nPremium = \`${c.premium}\`\nCategory ID = \`${c.category}\`\nQueue ID = \`${c.queue}\`\nCoupons ID = \`${c.coupons}\`\nCoupons role = \`${c["coupons-role"]}\``,
+            message.channel.send({
                 embed: {
                     color: 15105570,
                     title: "Отслеживаемые товары",
@@ -117,8 +117,7 @@ module.exports = {
                         { name: "lvl", value: lvls, inline: true},
                     ]
                 }
-            };
-            message.channel.send(em);	
+            });	
         } 
         else if (args[0].toLowerCase() === "remove") {
             message.channel.send("Упомяните роль, которую хотите перестать отслеживать или укажите ее id").then(() => {
@@ -144,34 +143,7 @@ module.exports = {
                 });
             });
         } 
-        else if (args[0].toLowerCase() === "edit") { 
-            let c = configurations_list.find(server => server.guild == message.guild.id);
-            switch(args[1].toLowerCase()) {
-                case "category":
-                    c.category = args[2];
-                    break;
-                case "queue":
-                    c.queue = args[2];
-                    break;
-                case "coupons":
-                    c.coupons = args[2];
-                    break;  
-                case "coupons-role":
-                    c["coupons-role"] = args[2];
-                    break;      
-                default:
-                    return message.channel.send("Неизвестный параметр!");
-            }
-            for (let i = 0; i < configurations_list.length; i++) {
-                if (configurations_list[i].guild == c.guild) {
-                    configurations_list[i] = c;
-                }
-            }
-            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
-                if (err) return print_e("[ERROR/track.js] " + err.message);
-            });
-            return message.channel.send("Изменено и сохранено!");
-        } else {
+        else {
 
         }
     }
