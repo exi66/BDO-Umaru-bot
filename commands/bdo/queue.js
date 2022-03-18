@@ -1,4 +1,3 @@
-const request = require("request-promise-native");
 const { print_e } = require("../../functions.js");
 const fs = require("fs");
 

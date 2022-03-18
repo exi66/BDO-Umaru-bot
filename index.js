@@ -31,18 +31,22 @@ client.on("guildDelete", guild => {
 client.on("message", async message => {
     if (message.author.bot) return;
     if (!message.guild) return;
-    if (!message.content.startsWith(config.prefix)) return;
-    if (!message.member) message.member = await message.guild.fetchMember(message);
-
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const cmd = args.shift().toLowerCase();
-    
-    if (cmd.length === 0) return;
-    
-    let command = client.commands.get(cmd);
-    if (!command) command = client.commands.get(client.aliases.get(cmd));
-
-    if (command) command.run(client, message, args, config);
+    if (message.content.startsWith(config.prefix)) {
+		const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
+		const cmd = args.shift().toLowerCase();
+		if (cmd.length === 0) return;
+		let command = client.commands.get(cmd);
+		if (!command) command = client.commands.get(client.aliases.get(cmd));
+		if (command) command.run(client, message, args, config);		
+	}		
+	else if (message.mentions.has(client.user.id)) {
+		const args = message.content.replace(/<@.?[0-9]*?>/g, "").trim().split(/ +/g);
+		const cmd = args.shift().toLowerCase();
+		if (cmd.length === 0) return;
+		let command = client.commands.get(cmd);
+		if (!command) command = client.commands.get(client.aliases.get(cmd));
+		if (command) command.run(client, message, args, config);
+	} else return;
 });
 client.login(config.token);
 var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder)) || [];
