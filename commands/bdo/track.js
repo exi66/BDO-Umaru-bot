@@ -19,8 +19,9 @@ module.exports = {
 	    //cheak, can server use this command or not. You can delete this, if want use bot only for yourself.
         if (args.length <= 0) 
             return message.reply("отсутствуют аргументы!").then(m => m.delete({ timeout: 10000 }));
+		args = args.map(e => e.toLowerCase());
         let filter = m => m.author.id === message.author.id;
-        if (args[0].toLowerCase() === "add") {
+        if (args[0] === "add") {
             let new_item = {
                 "role": "",
                 "enchant": 0,
@@ -97,7 +98,7 @@ module.exports = {
                 });
             });
         }
-        else if (args[0].toLowerCase() === "list") {
+        else if (args[0] === "list") {
             let c = configurations_list.find(server => server.guild == message.guild.id);
             if (c.items.length == 0) return message.channel.send("Список отслеживаемых товаров пуст!");
             let roles="", items="", lvls="";
@@ -119,7 +120,7 @@ module.exports = {
                 }
             });	
         } 
-        else if (args[0].toLowerCase() === "remove") {
+        else if (args[0] === "remove") {
             message.channel.send("Упомяните роль, которую хотите перестать отслеживать или укажите ее id").then(() => {
                 message.channel.awaitMessages(filter, {
                     max: 1,

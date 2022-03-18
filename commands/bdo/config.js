@@ -18,8 +18,9 @@ module.exports = {
             let c = configurations_list.find(server => server.guild == message.guild.id);
             return message.channel.send(`Guild ID = \`${c.guild}\`\nPremium = \`${c.premium}\`\nCategory ID = \`${c.category || " "}\`\nQueue ID = \`${c.queue || " "}\`\nCoupons ID = \`${c.coupons || " "}\`\nCoupons role = \`${c["coupons-role"] || " "}\``);
         }
+		args = args.map(e => e.toLowerCase());
         //let filter = m => m.author.id === message.author.id;
-        if (args[0].toLowerCase() === "edit") { 
+        if (args[0] === "edit") { 
             let c = configurations_list.find(server => server.guild == message.guild.id);
             switch(args[1].toLowerCase()) {
                 case "category":
