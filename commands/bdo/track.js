@@ -9,12 +9,15 @@ module.exports = {
     usage: "<add | list | remove >",
     run: (client, message, args, config) => {
         message.delete();
-        let configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
         if (!message.member.hasPermission("ADMINISTRATOR")) 
             return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
-        if (!configurations_list.find(server => server.guild == message.guild.id))
+
+        var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
+        var local_config = configurations_list.find(server => server.guild == message.guild.id);
+        
+        if (!local_config)
             return message.reply("конфигурация сервера отсутствует, использование не возможно!").then(m => m.delete({ timeout: 10000 }));                    
-        //if (!configurations_list.find(server => server.guild == message.guild.id).premium)
+        //if (!local_config.premium)
             //return message.reply("сервер не премиум, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
 	    //cheak, can server use this command or not. You can delete this, if want use bot only for yourself.
         if (args.length <= 0) 
@@ -22,6 +25,8 @@ module.exports = {
 		args = args.map(e => e.toLowerCase());
         let filter = m => m.author.id === message.author.id;
         if (args[0] === "add") {
+            if ((local_config.items.length >= 5) && !local_config.premium) 
+                return message.channel.send("Достигнут лимит на 5 отслеживаемых групп товаров для сервера! Удалите какую-нибудь группу для создания новой.");
             let new_item = {
                 "role": "",
                 "enchant": 0,
@@ -99,11 +104,10 @@ module.exports = {
             });
         }
         else if (args[0] === "list") {
-            let c = configurations_list.find(server => server.guild == message.guild.id);
-            if (c.items.length == 0) return message.channel.send("Список отслеживаемых товаров пуст!");
+            if (local_config.items.length == 0) return message.channel.send("Список отслеживаемых товаров пуст!");
             let roles="", items="", lvls="";
-            for (let e of c.items) {
-                items+=e.ids.slice(0, Math.min(5, c.items.length)).join(", ")+"\n";
+            for (let e of local_config.items) {
+                items+=e.ids.slice(0, Math.min(5, local_config.items.length)).join(", ")+"\n";
                 roles+="<@&"+e.role+">\n"; 
                 lvls+=e.enchant+"\n";  
             }
@@ -130,10 +134,9 @@ module.exports = {
                     let local_message = _message.first();
                     let role = local_message.mentions.roles.first() || message.guild.roles.cache.find(role => role.id === local_message);
                     if (!role) return message.channel.send("Не удалось распознать роль!");
-                    let c = configurations_list.find(server => server.guild == message.guild.id);
-                    for (let i = 0; i < c.items.length; i++) {
-                        if (c.items[i].role == role.id) {
-                            c.items.splice(i, 1);
+                    for (let i = 0; i < local_config.items.length; i++) {
+                        if (local_config.items[i].role == role.id) {
+                            local_config.items.splice(i, 1);
                             fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
                             	if (err) return print_e("[ERROR/track.js] " + err.message);
                             });							

@@ -1,0 +1,11 @@
+{
+    "token":  "", //bot token
+    "root": "", //root user, that can use exec command (bot hoster for example)
+    "prefix": "!!", 
+    "coupons_folder": "./data/coupons.json",
+    "queue_folder": "./data/queue.json",
+    "servers_configs_folder": "./data/servers.json",
+    "debug": false,
+    "coupons": true,
+    "queue": true
+}

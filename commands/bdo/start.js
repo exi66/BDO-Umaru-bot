@@ -7,9 +7,11 @@ module.exports = {
     usage: "<input>",
     run: async(client, message, args, config) => {
         message.delete();
-		let configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
         if (!message.member.hasPermission("ADMINISTRATOR")) return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
-		let filter = m => m.author.id === message.author.id;
+
+		var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
+		var filter = m => m.author.id === message.author.id;
+		
 		message.channel.send(`Автоматическая настройка создаст категорию, два канала в ней и базовые роли для отслеживания купонов и редких предметов. В случае отказа будет создан шаблон конфига без каких-либо параметров, который можно настроить командой \`${config.prefix}config\`. Хотите ли вы произвести автоматическую настройку? (Да/Нет)`).then(() => {
 			message.channel.awaitMessages(filter, {
 				max: 1,
