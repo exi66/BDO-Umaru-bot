@@ -50,7 +50,7 @@ module.exports = {
                         }).then(_message => {
                             let local_message = _message.first();
                             let local_id = local_message.content.replace(/\D/gm, " ").replace(/\s\s+/g, " ").split(" ");
-                            new_item.ids = local_id;
+                            new_item.ids = local_id.map(e => parseInt(e));
                             message.channel.send("Укажите уровень усиления (общий для всей группы ранее указанных предметов).").then(() => {
                                 message.channel.awaitMessages(filter, {
                                     max: 1,

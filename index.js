@@ -141,7 +141,7 @@ setInterval(function() {
 								let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
 								for (let local_items of local_guilds["items"]) {
 									for (let item of items) {		
-										if(local_items["ids"].includes(item[0].toString()) && item[1] == local_items["enchant"]) {
+										if(local_items["ids"].includes(parseInt(item[0])) && item[1] == local_items["enchant"]) {
 											important_items_list.push(item);
 											if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
 											lvls += item[1]+"\n";
