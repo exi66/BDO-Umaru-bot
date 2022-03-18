@@ -1,4 +1,5 @@
 const request = require("request-promise-native");
+const { print_e } = require("../../functions.js");
 
 module.exports = {
     name: "umaru",
@@ -9,7 +10,7 @@ module.exports = {
 		let req = args.join(" ") || "umaru";
 		request({
 			method: "GET",
-			url: `https://g.tenor.com/v1/random?q=${req}&key=4HDPRLGK9KPI&limit=1`,
+			url: encodeURI(`https://g.tenor.com/v1/random?q=${req}&key=4HDPRLGK9KPI&limit=1`),
 			headers: {
 				"User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
 			}
