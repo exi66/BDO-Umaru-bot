@@ -17,6 +17,6 @@ module.exports = {
 			let data = JSON.parse(body);	
 			let answer = data.results[0].url || "ничего найдено(";
 			message.channel.send(answer);
-		});
+		}).catch(function(e) { print_e("[ERROR/umaru.js]: Request error, "+e.message); });;
     }
 }
