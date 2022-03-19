@@ -6,21 +6,43 @@ module.exports = {
     description: "Быстрое начало работы",
     usage: "<input>",
     run: async(client, message, args, config) => {
-        message.delete();
-        if (!message.member.hasPermission("ADMINISTRATOR")) return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
+        if (!message.member.hasPermission("ADMINISTRATOR")) 
+			return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
 
+		message.delete();
 		var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
 		var filter = m => m.author.id === message.author.id;
+		var all_messages = [];
+
+		function save(config, configurations_list, local_config) {
+			let flag = false;
+			for (let i = 0; i < configurations_list.length; i++) {
+				if (configurations_list[i].guild == local_config.guild) {
+					configurations_list[i] = local_config;
+					flag = true;
+				}
+			}
+			if (!flag) configurations_list.push(local_config);
+			fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
+				if (err) {
+					all_messages.forEach(e => e.delete({ timeout: 10000 }));
+					message.channel.send("Ошибка!").then(m => m.delete({ timeout: 10000 }));
+					return print_e(err);
+				}
+			});		
+		}
 		
-		message.channel.send(`Автоматическая настройка создаст категорию, два канала в ней и базовые роли для отслеживания купонов и редких предметов. В случае отказа будет создан шаблон конфига без каких-либо параметров, который можно настроить командой \`${config.prefix}config\`. Хотите ли вы произвести автоматическую настройку? (Да/Нет)`).then(() => {
+		message.channel.send(`Автоматическая настройка создаст категорию, два канала в ней и базовые роли для отслеживания купонов и редких предметов. В случае отказа будет создан шаблон конфига без каких-либо параметров, который можно настроить командой \`${config.prefix}config\`. Хотите ли вы произвести автоматическую настройку? (Да/Нет)`).then(m => {
+			all_messages.push(m);
 			message.channel.awaitMessages(filter, {
 				max: 1,
 				time: 240000,
 				errors: ["time"]
 			}).then(async _message => {
+				all_messages.push(_message.first());
 				let local_message = _message.first();
 				if (local_message.content.toLowerCase() === "y" || local_message.content.toLowerCase() === "yes" || local_message.content.toLowerCase() === "да") {
-					let local_config = {
+					var local_config = {
 						"guild": message.guild.id,
 						"premium": false,
 						"category": "",
@@ -192,22 +214,9 @@ module.exports = {
 					}
 					save(config, configurations_list, local_config);	
 				}
-				message.channel.send(`Конфигурация сервера успешно создана! Для редактирования отслеживаемых товаров аукциона используйте команду \`${config.prefix}track\`, для изменения конфигурации сервера \`${config.prefix}config\`.`);
+				all_messages.forEach(e => e.delete({ timeout: 10000 }));
+				return message.channel.send(`Конфигурация сервера успешно создана! Для редактирования отслеживаемых товаров аукциона используйте команду \`${config.prefix}track\`, для изменения конфигурации сервера \`${config.prefix}config\`.`).then(m => m.delete({ timeout: 10000 }));
 			});
 		});																														
     }
-}
-
-function save(config, configurations_list, local_config) {
-	let flag = false;
-	for (let i = 0; i < configurations_list.length; i++) {
-		if (configurations_list[i].guild == local_config.guild) {
-			configurations_list[i] = local_config;
-			flag = true;
-		}
-	}
-	if (!flag) configurations_list.push(local_config);
-	fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
-		if (err) return print_e(err);
-	});		
 }

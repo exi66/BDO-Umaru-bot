@@ -8,7 +8,6 @@ module.exports = {
     description: "Выдает доступные купоны с Орбиты Игр",
     usage: "<input>",
     run: (client, message, args, config) => {
-        message.delete();
 		try {
 			let coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder));
 			if (coupons_list.length > 0) {
@@ -16,8 +15,9 @@ module.exports = {
 				try {
 					message.channel.send({
 						embed: {
-							color: 15105570,
+							color: "#2f3136",
 							title: "Купоны",
+							url: "https://orbit-games.com/",
 							timestamp: new Date(),
 							description: codes
 						}

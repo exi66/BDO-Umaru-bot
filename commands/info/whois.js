@@ -6,7 +6,7 @@ module.exports = {
     name: "whois",
 	category: "info",
     aliases: ["who", "user", "info"],
-    description: "Возвращает информацию о пользователе.",
+    description: "Возвращает информацию о пользователе",
     usage: "[username | id | mention]",
     run: (client, message, args) => {
         const member = getMember(message, args.join(" "));
@@ -39,6 +39,6 @@ module.exports = {
         if (member.user.presence.game) 
             embed.addField('В игре', stripIndents`**> Название:** ${member.user.presence.game.name}`);
 
-        message.channel.send(embed);
+        return message.channel.send(embed).then(m => m.delete({ timeout: 10000 }));
     }
 }

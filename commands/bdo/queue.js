@@ -8,7 +8,6 @@ module.exports = {
     description: "Выдает текущую очередь регистрации на аукционе",
     usage: "<input>",
     run: (client, message, args, config) => {
-        message.delete();
 		try {
 			let queue_list = JSON.parse(fs.readFileSync(config.queue_folder));
 			let items = queue_list.items || [];
@@ -19,7 +18,7 @@ module.exports = {
 				try {
 					message.channel.send({
 						embed: {
-							color: 15105570,
+							color: "#2f3136",
 							title: "Очередь аукциона",
 							timestamp: new Date(queue_list.lastUpdate),
 							fields: [

@@ -107,8 +107,9 @@ setInterval(function() {
 									if (local_channel) local_channel.send({
 										content: `<@&${local_guilds["coupons-role"]}>`,
 										embed: {
-											color: 15105570,
+											color: "#2f3136",
 											title: "Купоны",
+											url: "https://orbit-games.com/",
 											timestamp: new Date(),
 											description: codes
 										}
@@ -160,7 +161,7 @@ setInterval(function() {
 										if (local_channel) local_channel.send({
 											content: mentions,
 											embed: {
-												color: 15105570,
+												color: "#2f3136",
 												title: "Очередь аукциона",
 												timestamp: new Date(),
 												fields: [

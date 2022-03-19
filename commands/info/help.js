@@ -5,7 +5,7 @@ module.exports = {
     name: "help",
     category: "info",
 	aliases: ["h"],
-    description: "Информация о командах.",
+    description: "Информация о командах",
     usage: "[command | alias]",
     run: async (client, message, args) => {
         if (args[0]) {
@@ -18,7 +18,7 @@ module.exports = {
 
 function getAll(client, message) {
     const embed = new MessageEmbed()
-        .setColor("RANDOM")
+        .setColor("#2f3136")
 
     const commands = (category) => {
         return client.commands
@@ -42,7 +42,7 @@ function getCMD(client, message, input) {
     let info = `Нет информации о команде **${input.toLowerCase()}**`;
 
     if (!cmd) {
-        return message.channel.send(embed.setColor("RED").setDescription(info));
+        return message.channel.send(info);
     }
 
     if (cmd.name) info = `**Команда**: ${cmd.name}`;
@@ -53,5 +53,5 @@ function getCMD(client, message, input) {
         embed.setFooter(`Синтаксис: <> = необходимо, [] = опционально`);
     }
 
-    return message.channel.send(embed.setColor("GREEN").setDescription(info));
+    return message.channel.send(embed.setColor("#2f3136").setDescription(info));
 }
