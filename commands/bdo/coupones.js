@@ -9,10 +9,11 @@ module.exports = {
     run: (client, message, args, config) => {
 		try {
 			var coupons_list = [];
-			fs.readFile(config.coupons_folder, (err, data) => {
-				if (err) return print_e("[ERROR/coupones.js]" + err.message);
-				coupons_list = JSON.parse(data);
-			});
+			try {
+				coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
+			} catch (err) {
+				print_e("[ERROR/coupones.js]" + err.message);
+			}
 			if (coupons_list.length > 0) {
 				let codes = coupons_list.map(e => "`" + e + "`").join("\n");
 				try {

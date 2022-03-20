@@ -10,10 +10,11 @@ module.exports = {
 
 		message.delete();
         var configurations_list = [];
-        fs.readFile(config.servers_configs_folder, (err, data) => {
-            if (err) return print_e("[ERROR/start.js]" + err.message);
-            configurations_list = JSON.parse(data);
-        });
+		try {
+			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
+		} catch (err) {
+			print_e("[ERROR/start.js]" + err.message);
+		}
 		var filter = m => m.author.id === message.author.id;
 		var all_messages = [];
 

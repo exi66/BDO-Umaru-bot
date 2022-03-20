@@ -9,10 +9,11 @@ module.exports = {
     run: (client, message, args, config) => {
 		try {
 			var queue_list = [];
-			fs.readFile(config.queue_folder, (err, data) => {
-				if (err) return print_e("[ERROR/queue.js]" + err.message);
-				queue_list = JSON.parse(data);
-			});
+			try {
+				queue_list = JSON.parse(fs.readFileSync(config.queue_folder, "utf8"));
+			} catch (err) {
+				print_e("[ERROR/queue.js]" + err.message);
+			}
 			let items = queue_list.items || [];
 			if (items.length > 0) {
 				let names = items.map(e => e[4]).join("\n"), 

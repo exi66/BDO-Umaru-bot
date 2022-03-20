@@ -8,16 +8,17 @@ module.exports = {
     aliases: ["conf"],
     description: "Управляет конфигурацией сервера",
     usage: "<edit> <key> <value>",
-    run: (client, message, args, config) => {
+    run: async(client, message, args, config) => {
         if (!message.member.hasPermission("ADMINISTRATOR")) 
             return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
 
         message.delete();
         var configurations_list = [];
-        fs.readFile(config.servers_configs_folder, (err, data) => {
-            if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
-            configurations_list = JSON.parse(data);
-        });
+		try {
+			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
+		} catch (err) {
+			print_e("[ERROR/config.js]" + err.message);
+		}
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
 
         if (!local_config)

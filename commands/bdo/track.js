@@ -13,10 +13,11 @@ module.exports = {
 
         message.delete();
         var configurations_list = [];
-        fs.readFile(config.servers_configs_folder, (err, data) => {
-            if (err) return print_e("[ERROR/track.js]" + err.message);
-            configurations_list = JSON.parse(data);
-        });
+		try {
+			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
+		} catch (err) {
+			print_e("[ERROR/track.js]" + err.message);
+		}
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
         
         if (!local_config)
