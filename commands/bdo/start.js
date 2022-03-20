@@ -208,8 +208,10 @@ module.exports = {
 							save(config, configurations_list, local_config);	
 						});			
 					});
-					save(config, configurations_list, local_config);					
-				} else {
+					save(config, configurations_list, local_config);
+					all_messages.forEach(e => e.delete({ timeout: 10000 }));
+					return message.channel.send(`Конфигурация сервера успешно создана! Для редактирования отслеживаемых товаров аукциона используйте команду \`${config.prefix}track\`, для изменения конфигурации сервера \`${config.prefix}config\`.`).then(m => m.delete({ timeout: 10000 }));						
+				} else if (local_message.content.toLowerCase() === "n" || local_message.content.toLowerCase() === "no" || local_message.content.toLowerCase() === "нет") {
 					let local_config = {
 						"guild": message.guild.id,
 						"premium": false,
@@ -219,10 +221,13 @@ module.exports = {
 						"coupons-role": "",
 						"items": []
 					}
-					save(config, configurations_list, local_config);	
+					save(config, configurations_list, local_config);
+					all_messages.forEach(e => e.delete({ timeout: 10000 }));
+					return message.channel.send(`Конфигурация сервера успешно создана! Для редактирования отслеживаемых товаров аукциона используйте команду \`${config.prefix}track\`, для изменения конфигурации сервера \`${config.prefix}config\`.`).then(m => m.delete({ timeout: 10000 }));		
+				} else {
+					all_messages.forEach(e => e.delete({ timeout: 10000 }));
+					return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));		
 				}
-				all_messages.forEach(e => e.delete({ timeout: 10000 }));
-				return message.channel.send(`Конфигурация сервера успешно создана! Для редактирования отслеживаемых товаров аукциона используйте команду \`${config.prefix}track\`, для изменения конфигурации сервера \`${config.prefix}config\`.`).then(m => m.delete({ timeout: 10000 }));
 			});
 		});																														
     }

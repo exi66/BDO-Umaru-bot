@@ -25,7 +25,7 @@ module.exports = {
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
         
         if (!local_config)
-            return message.reply("конфигурация сервера отсутствует, использование не возможно!").then(m => m.delete({ timeout: 10000 }));                    
+            return message.reply("конфигурация сервера отсутствует, использование невозможно!").then(m => m.delete({ timeout: 10000 }));                    
         //if (!local_config.premium)
             //return message.reply("сервер не премиум, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
 	    //cheak, can server use this command or not. You can delete this, if want use bot only for yourself.
