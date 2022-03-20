@@ -5,10 +5,14 @@ module.exports = {
 	category: "bdo",
     description: "Быстрое начало работы",
     run: async(client, message, args, config) => {
-        if (!message.member.hasPermission("ADMINISTRATOR")) 
-			return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
+		var all_messages = [];
+		all_messages.push(message);
 
-		message.delete();
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+			all_messages.forEach(e => e.delete({ timeout: 10000 }));
+			return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
+		}
+
         var configurations_list = [];
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
@@ -16,7 +20,6 @@ module.exports = {
 			print_e("[ERROR/start.js]" + err.message);
 		}
 		var filter = m => m.author.id === message.author.id;
-		var all_messages = [];
 
 		function save(config, configurations_list, local_config) {
 			let flag = false;

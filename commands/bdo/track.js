@@ -8,10 +8,14 @@ module.exports = {
     description: "Управляет отслеживанием аукциона",
     usage: "<add | remove>",
     run: (client, message, args, config) => {
-        if (!message.member.hasPermission("ADMINISTRATOR")) 
-            return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
+        var all_messages = [];
+        all_messages.push(message);
 
-        message.delete();
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            all_messages.forEach(e => e.delete({ timeout: 10000 }));
+            return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
+        }
+
         var configurations_list = [];
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
@@ -46,7 +50,6 @@ module.exports = {
             });	            
         }
 		args = args.map(e => e.toLowerCase());
-        var all_messages = [];
         var filter = m => m.author.id === message.author.id;
         if (args[0] === "add") {
             if ((local_config.items.length >= 5) && !local_config.premium) 

@@ -9,10 +9,11 @@ module.exports = {
     description: "Управляет конфигурацией сервера",
     usage: "<edit> <key> <value>",
     run: async(client, message, args, config) => {
-        if (!message.member.hasPermission("ADMINISTRATOR")) 
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            message.delete({ timeout: 10000 });
             return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
+        }
 
-        message.delete();
         var configurations_list = [];
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
@@ -21,8 +22,10 @@ module.exports = {
 		}
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
 
-        if (!local_config)
-            return message.reply("конфигурация сервера отсутствует, использование не возможно!").then(m => m.delete({ timeout: 10000 }));                    
+        if (!local_config) {
+            message.delete({ timeout: 10000 });
+            return message.reply("конфигурация сервера отсутствует, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
+        }
         if (args.length <= 0) {
             return message.channel.send({
                 embed: {
@@ -55,8 +58,13 @@ module.exports = {
                     return message.channel.send("Неизвестный параметр! Изменять можно только `category`, `queue`, `coupons`, `coupons-role`.").then(m => m.delete({ timeout: 10000 }));
             }
             fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
-                if (err) return print_e("[ERROR/config.js] " + err.message);
+                if (err) {
+                    message.delete({ timeout: 10000 });
+                    message.channel.send("Ошибка!").then(m => m.delete({ timeout: 10000 }));
+                    return print_e("[ERROR/config.js] " + err.message);
+                }
             });
+            message.delete({ timeout: 10000 });
             return message.channel.send("Изменено и сохранено!").then(m => m.delete({ timeout: 10000 }));
         } else if(args[0] === "json") {
             let buffer = Buffer.from(JSON.stringify(local_config, null, 4));
