@@ -228,6 +228,9 @@ module.exports = {
 					all_messages.forEach(e => e.delete({ timeout: 10000 }));
 					return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));		
 				}
+			}).catch(collected => {
+				all_messages.forEach(e => e.delete({ timeout: 10000 }));
+				return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));
 			});
 		});																														
     }
