@@ -50,15 +50,17 @@ client.on("message", async message => {
 });
 client.login(config.token);
 var configurations_list = [];
-fs.readFile(config.servers_configs_folder, (err, data) => {
-	if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
-	configurations_list = JSON.parse(data);
-});
+try {
+	configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
+} catch (err) {
+	print_e("[ERROR/Read_servers]" + err.message);
+}
 var coupons_list = [];
-fs.readFile(config.coupons_folder, (err, data) => {
-	if (err) return print_e("[ERROR/Read_coupons]" + err.message);
-	coupons_list = JSON.parse(data);
-});	
+try {
+	coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
+} catch (err) {
+	print_e("[ERROR/Read_coupons]" + err.message);
+}	
 
 function checkAndRemove() {
 	if (configurations_list.length < 1) return;
@@ -76,14 +78,16 @@ function checkAndRemove() {
 
 //main cycle
 setInterval(function() {
-	fs.readFile(config.servers_configs_folder, (err, data) => {
-		if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
-		configurations_list = JSON.parse(data);
-	});
-	fs.readFile(config.coupons_folder, (err, data) => {
-		if (err) return print_e("[ERROR/Read_coupons]" + err.message);
-		coupons_list = JSON.parse(data);
-	});		
+	try {
+		configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
+	} catch (err) {
+		print_e("[ERROR/read_servers]" + err.message);
+	}
+	try {
+		coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
+	} catch (err) {
+		print_e("[ERROR/read_coupons]" + err.message);
+	}	
 	try {
 		if (configurations_list.length > 0) {
 			if (config.coupons) {	
