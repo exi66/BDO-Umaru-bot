@@ -8,7 +8,11 @@ module.exports = {
     description: "Выдает доступные купоны с Орбиты Игр",
     run: (client, message, args, config) => {
 		try {
-			let coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder));
+			var coupons_list = [];
+			fs.readFile(config.coupons_folder, (err, data) => {
+				if (err) return print_e("[ERROR/coupones.js]" + err.message);
+				coupons_list = JSON.parse(data);
+			});
 			if (coupons_list.length > 0) {
 				let codes = coupons_list.map(e => "`" + e + "`").join("\n");
 				try {

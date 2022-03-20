@@ -14,7 +14,7 @@ module.exports = {
         message.delete();
         var configurations_list = [];
         fs.readFile(config.servers_configs_folder, (err, data) => {
-            if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
+            if (err) return print_e("[ERROR/track.js]" + err.message);
             configurations_list = JSON.parse(data);
         });
         var local_config = configurations_list.find(server => server.guild == message.guild.id);

@@ -9,7 +9,11 @@ module.exports = {
 			return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
 
 		message.delete();
-		var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
+        var configurations_list = [];
+        fs.readFile(config.servers_configs_folder, (err, data) => {
+            if (err) return print_e("[ERROR/start.js]" + err.message);
+            configurations_list = JSON.parse(data);
+        });
 		var filter = m => m.author.id === message.author.id;
 		var all_messages = [];
 
