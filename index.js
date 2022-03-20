@@ -113,11 +113,12 @@ setInterval(function() {
 								if (err) return print_e("[ERROR/Orbit_games]: Cannot save all coupones, "+err.message);
 							});
 							let codes = coupons_list.map(e => "`" + e + "`").join("\n");
-							for (let local_guilds of configurations_list) {						
+							let coupons_configurations_list = configurations_list.filter(e => e.coupons.trim());
+							for (let local_guild of coupons_configurations_list) {						
 								try {
-									let local_channel = client.channels.cache.get(local_guilds["coupons"]);
+									let local_channel = client.channels.cache.get(local_guild.coupons);
 									if (local_channel) local_channel.send({
-										content: `<@&${local_guilds["coupons-role"]}>`,
+										content: `<@&${local_guild["coupons-role"]}>`,
 										embed: {
 											color: "#2f3136",
 											title: "Купоны",
@@ -149,10 +150,11 @@ setInterval(function() {
 						});
 						let items = data["items"];
 						//let lastupdate = data["lastUpdate"];
-						if (items.length > 0) {					
-							for (let local_guilds of configurations_list) {
+						if (items.length > 0) {
+							let queue_configurations_list = configurations_list.filter(e => e.queue.trim());
+							for (let local_guild of queue_configurations_list) {
 								let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
-								for (let local_items of local_guilds["items"]) {
+								for (let local_items of local_guild["items"]) {
 									for (let item of items) {		
 										if(local_items["ids"].includes(parseInt(item[0])) && item[1] == local_items["enchant"]) {
 											important_items_list.push(item);
@@ -169,7 +171,7 @@ setInterval(function() {
 								}
 								if (important_items_list.length > 0) {						
 									try {
-										let local_channel = client.channels.cache.get(local_guilds["queue"]);
+										let local_channel = client.channels.cache.get(local_guild["queue"]);
 										if (local_channel) local_channel.send({
 											content: mentions,
 											embed: {
