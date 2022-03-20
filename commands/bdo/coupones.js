@@ -6,7 +6,6 @@ module.exports = {
 	category: "bdo",
     aliases: ["c", "coupon", "cupon"],
     description: "Выдает доступные купоны с Орбиты Игр",
-    usage: "<input>",
     run: (client, message, args, config) => {
 		try {
 			let coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder));

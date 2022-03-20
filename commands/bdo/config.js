@@ -13,7 +13,11 @@ module.exports = {
             return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
 
         message.delete();
-        var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
+        var configurations_list = [];
+        fs.readFile(config.servers_configs_folder, (err, data) => {
+            if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
+            configurations_list = JSON.parse(data);
+        });
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
 
         if (!local_config)
@@ -32,28 +36,22 @@ module.exports = {
         if (args[0] === "edit") { 
             switch(args[1].toLowerCase()) {
                 case "category":
-                    c.category = args[2];
+                    local_config.category = args[2];
                     break;
                 case "queue":
-                    c.queue = args[2];
+                    local_config.queue = args[2];
                     break;
                 case "coupons":
-                    c.coupons = args[2];
+                    local_config.coupons = args[2];
                     break;  
                 case "coupons-role":
-                    c["coupons-role"] = args[2];
+                    local_config["coupons-role"] = args[2];
                     break;
                 case "premium":
-                    if (message.author.id == config.root) c.premium = args[2] == "true" ? true : false;
+                    if (message.author.id == config.root) local_config.premium = args[2] == "true" ? true : false;
                     break;      
                 default:
                     return message.channel.send("Неизвестный параметр! Изменять можно только `category`, `queue`, `coupons`, `coupons-role`.").then(m => m.delete({ timeout: 10000 }));
-            }
-            for (let i = 0; i < configurations_list.length; i++) {
-                if (configurations_list[i].guild == local_config.guild) {
-                    configurations_list[i] = local_config;
-                    break;
-                }
             }
             fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
                 if (err) return print_e("[ERROR/config.js] " + err.message);

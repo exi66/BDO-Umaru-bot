@@ -49,8 +49,16 @@ client.on("message", async message => {
 	} else return;
 });
 client.login(config.token);
-var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder)) || [];
-var coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder)) || [];
+var configurations_list = [];
+fs.readFile(config.servers_configs_folder, (err, data) => {
+	if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
+	configurations_list = JSON.parse(data);
+});
+var coupons_list = [];
+fs.readFile(config.coupons_folder, (err, data) => {
+	if (err) return print_e("[ERROR/Read_coupons]" + err.message);
+	coupons_list = JSON.parse(data);
+});	
 
 function checkAndRemove() {
 	if (configurations_list.length < 1) return;

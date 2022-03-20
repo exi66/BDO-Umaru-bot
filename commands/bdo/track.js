@@ -6,13 +6,17 @@ module.exports = {
 	category: "bdo",
     aliases: ["t"],
     description: "Управляет отслеживанием аукциона",
-    usage: "<add | remove >",
+    usage: "<add | remove>",
     run: (client, message, args, config) => {
         if (!message.member.hasPermission("ADMINISTRATOR")) 
             return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
 
         message.delete();
-        var configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder));
+        var configurations_list = [];
+        fs.readFile(config.servers_configs_folder, (err, data) => {
+            if (err) return print_e("[ERROR/Read_servers_configs]" + err.message);
+            configurations_list = JSON.parse(data);
+        });
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
         
         if (!local_config)
@@ -122,28 +126,23 @@ module.exports = {
                                             all_messages.forEach(e => e.delete({ timeout: 10000 }));
                                             return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));
                                         });
-                                    })
-                                    
+                                    });
                                 }).catch(collected => {
                                     all_messages.forEach(e => e.delete({ timeout: 10000 }));
                                     return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));
                                 });
-                            })
-                            
+                            });
                         }).catch(collected => {
                             all_messages.forEach(e => e.delete({ timeout: 10000 }));
                             return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));
                         });
-                }).catch(collected => {
-                    all_messages.forEach(e => e.delete({ timeout: 10000 }));
-                    return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));
-                });
+                    });
                 }).catch(collected => {
                     all_messages.forEach(e => e.delete({ timeout: 10000 }));
                     return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));
                 });
             });
-        } else if (args[0] === "remove") {
+        } else if (args[0] === "remove" || args[0] === "rm") {
             message.channel.send("Упомяните роль, которую хотите перестать отслеживать или укажите ее id").then(m => {
                 all_messages.push(m);
                 message.channel.awaitMessages(filter, {
@@ -209,13 +208,16 @@ module.exports = {
                                     message.channel.send("Ошибка!").then(m => m.delete({ timeout: 10000 }));
                                     return print_e("[ERROR/track.js] "+e.message);
                                 }
+                            }).catch(collected => {
+                                all_messages.forEach(e => e.delete({ timeout: 10000 }));
+                                return message.channel.send("Команда отменена!").then(m => m.delete({ timeout: 10000 }));
                             });
                         });                        
                     }
                     else if (local_deleted.length == 1) {
                         try {
                             let index = local_config.items.indexOf(local_deleted[0]);
-                            if (local_index !== -1) {
+                            if (index !== -1) {
                                 local_config.items.splice(index, 1);
                             }
                             //configurations_list[configurations_list.indexOf(local_config)] = local_config;

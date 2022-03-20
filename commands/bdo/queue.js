@@ -6,7 +6,6 @@ module.exports = {
 	category: "bdo",
     aliases: ["q", "que"],
     description: "Выдает текущую очередь регистрации на аукционе",
-    usage: "<input>",
     run: (client, message, args, config) => {
 		try {
 			let queue_list = JSON.parse(fs.readFileSync(config.queue_folder));

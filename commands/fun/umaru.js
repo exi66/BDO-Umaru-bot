@@ -4,7 +4,7 @@ const { print_e } = require("../../functions.js");
 module.exports = {
     name: "umaru",
 	category: "fun",
-    description: "Мммм",
+    description: "[ search request ]",
     run: async (client, message, args) => {
 		message.delete();
 		let req = args.join(" ") || "umaru";

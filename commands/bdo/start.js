@@ -4,7 +4,6 @@ module.exports = {
     name: "start",
 	category: "bdo",
     description: "Быстрое начало работы",
-    usage: "<input>",
     run: async(client, message, args, config) => {
         if (!message.member.hasPermission("ADMINISTRATOR")) 
 			return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
@@ -62,7 +61,7 @@ module.exports = {
 					});	
 					await message.guild.roles.create({
 						data: {
-							name: "БС-V",
+							name: "V: БС",
 							color: "#bf0000",
 							mentionable: true,
 						},
@@ -116,7 +115,7 @@ module.exports = {
 					});	
 					await message.guild.roles.create({
 						data: {
-							name: "Манос-V",
+							name: "V: Бижутерия Маноса",
 							color: "#398e55",
 							mentionable: true,
 						},
@@ -135,7 +134,7 @@ module.exports = {
 					});	
 					await message.guild.roles.create({
 						data: {
-							name: "Деборика-IV",
+							name: "IV: Бижутерия Деборики",
 							color: "#c09c3f",
 							mentionable: true,
 						},
@@ -152,7 +151,7 @@ module.exports = {
 					});
 					await message.guild.roles.create({
 						data: {
-							name: "Деборика-V",
+							name: "V: Бижутерия Деборики",
 							color: "#ffce53",
 							mentionable: true,
 						},
