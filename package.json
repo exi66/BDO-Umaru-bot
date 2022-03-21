@@ -1,6 +1,6 @@
 {
   "name": "bdo-umaru-bot",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "bot for bdo",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "bdo"
   ],
   "author": "exi66",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "ascii-table": "0.0.9",
     "common-tags": "^1.8.0",
