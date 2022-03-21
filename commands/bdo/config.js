@@ -1,4 +1,4 @@
-const { print_e } = require("../../functions.js");
+const { printError } = require("../../functions.js");
 const fs = require("fs");
 const { MessageAttachment } = require('discord.js')
 
@@ -17,8 +17,8 @@ module.exports = {
         var configurations_list = [];
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
-		} catch (err) {
-			print_e("[ERROR/config.js]" + err.message);
+		} catch (e) {
+			printError("ERROR/config.js", e.message);
 		}
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
 
@@ -57,11 +57,11 @@ module.exports = {
                 default:
                     return message.channel.send("Неизвестный параметр! Изменять можно только `category`, `queue`, `coupons`, `coupons-role`.").then(m => m.delete({ timeout: 10000 }));
             }
-            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
-                if (err) {
+            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
+                if (e) {
                     message.delete({ timeout: 10000 });
                     message.channel.send("Ошибка!").then(m => m.delete({ timeout: 10000 }));
-                    return print_e("[ERROR/config.js] " + err.message);
+                    return printError("ERROR/config.js", e.message);
                 }
             });
             message.delete({ timeout: 10000 });

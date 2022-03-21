@@ -1,4 +1,4 @@
-const { print_e } = require("./functions.js");
+const { printError } = require("./functions.js");
 const request = require("request-promise-native");
 const fs = require("fs");
 
@@ -7,14 +7,14 @@ module.exports = (config, client) => {
         var configurations_list = [], coupons_list = [];
         try {
             configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
-        } catch (err) {
-            print_e("[ERROR/scraper.js/read_servers] " + err.message);
+        } catch (e) {
+            printError("ERROR/scraper.js/read_servers", e.message);
         }
         try {
             coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
-        } catch (err) {
-            print_e("[ERROR/scraper.js/read_coupons] " + err.message);
-        }	
+        } catch (e) {
+            printError("ERROR/scraper.js/read_coupons", e.message);
+        }
         try {
             if (configurations_list.length > 0) {
                 if (config.coupons) {	
@@ -29,15 +29,15 @@ module.exports = (config, client) => {
                         if (body !== "" && body != null) {	
                             let div = body.match(/<([^\s]+).*?id="text-15".*?>(.+?)<\/\1>/g);
                             let search = div[0].match(/\(?[a-zA-Z0-9]{4}\)?-?[a-zA-Z0-9]{4}?-?[a-zA-Z0-9]{4}-?[a-zA-Z0-9]{4}/gm);
-                            if (!search) return print_e("[ERROR/scraper.js/orbit_games] div with coupones not found, need to edit regex");
+                            if (!search) return printError("ERROR/scraper.js", "div with coupones not found, need to edit regex");
                             let all_coupones_list = [], new_coupones_list = [];
                             for (let c of search) {
                                 if (!all_coupones_list.includes(c.toUpperCase())) all_coupones_list.push(c.toUpperCase());
                                 if (!coupons_list.includes(c.toUpperCase())) new_coupones_list.push(c.toUpperCase());
                             }							
                             if (new_coupones_list.length > 0) {
-                                fs.writeFile(config.coupons_folder, JSON.stringify(all_coupones_list, null, 4), function (err) {
-                                    if (err) return print_e("[ERROR/scraper.js/orbit_games]: Cannot save all coupones, "+err.message);
+                                fs.writeFile(config.coupons_folder, JSON.stringify(all_coupones_list, null, 4), function(e) {
+                                    if (e) return printError("ERROR/scraper.js", "cannot save all coupones, "+err.message);
                                 });
                                 let codes = coupons_list.map(e => "`" + e + "`").join("\n");
                                 let coupons_configurations_list = configurations_list.filter(e => e.coupons.trim());
@@ -55,12 +55,12 @@ module.exports = (config, client) => {
                                             }
                                         });
                                     } catch (e) {
-                                        print_e("[ERROR/scraper.js/orbit_games] Cannot send new coupones, "+e.message);
+                                        printError("ERROR/scraper.js", "cannot send new coupones, "+e.message);
                                     }
                                 }							
                             }
                         }
-                    }).catch(function(e) { print_e("[ERROR/Orbit_games] Request error, "+e.message) });
+                    }).catch(function(e) { printError("ERROR/scraper.js", "coupons request error, "+e.message) });
                 }
                 if (config.queue) {					
                     request({
@@ -72,8 +72,8 @@ module.exports = (config, client) => {
                     }).then(body => {
                         if (body !== "" && body != null) {
                             let data = JSON.parse(body);
-                            fs.writeFile(config.queue_folder, JSON.stringify(data, null, 4), function (err) {
-                                if (err) return print_e("[ERROR/scraper.js/queue] Cannot save queue, "+err.message);
+                            fs.writeFile(config.queue_folder, JSON.stringify(data, null, 4), function(e) {
+                                if (e) return printError("ERROR/scraper.js", "cannot save queue, "+err.message);
                             });
                             let items = data["items"];
                             //let lastupdate = data["lastUpdate"];
@@ -113,17 +113,17 @@ module.exports = (config, client) => {
                                                 }
                                             });
                                         } catch (e) {
-                                            print_e("[ERROR/scraper.js/queue] Cannot send queue, "+e.message);
+                                            printError("ERROR/scraper.js", "cannot send queue, "+e.message);
                                         }									
                                     }
                                 }							
                             }
                         }
-                    }).catch(function(e) { print_e("[ERROR/scraper.js/queue] Request error, "+e.message); });
+                    }).catch(function(e) { printError("ERROR/scraper.js", "queue request error, "+e.message) });
                 }
             }
         } catch (e) {
-            print_e("[ERROR/scraper.js] General try-catch error, "+e.message);
+            printError("ERROR/scraper.js", "general try-catch error, "+e.message);
         }
     }, config.debug ? 10*1000 : 5*60*1000);        
 }

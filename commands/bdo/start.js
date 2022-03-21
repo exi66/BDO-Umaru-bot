@@ -1,4 +1,4 @@
-const { print_e } = require("../../functions.js");
+const { printError } = require("../../functions.js");
 const fs = require("fs");
 
 module.exports = {
@@ -17,8 +17,8 @@ module.exports = {
         var configurations_list = [];
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
-		} catch (err) {
-			print_e("[ERROR/start.js] " + err.message);
+		} catch (e) {
+			printError("ERROR/start.js", e.message);
 		}
 		var filter = m => m.author.id === message.author.id;
 
@@ -31,11 +31,11 @@ module.exports = {
 				}
 			}
 			if (!flag) configurations_list.push(local_config);
-			fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
-				if (err) {
+			fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
+				if (e) {
 					all_messages.forEach(e => e.delete({ timeout: 10000 }));
 					message.channel.send("Ошибка!").then(m => m.delete({ timeout: 10000 }));
-					return print_e(err);
+					return printError("ERROR/start.js", e.message);
 				}
 			});		
 		}
