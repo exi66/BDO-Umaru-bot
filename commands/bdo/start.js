@@ -1,3 +1,4 @@
+const { print_e } = require("../../functions.js");
 const fs = require("fs");
 
 module.exports = {
@@ -17,7 +18,7 @@ module.exports = {
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
 		} catch (err) {
-			print_e("[ERROR/start.js]" + err.message);
+			print_e("[ERROR/start.js] " + err.message);
 		}
 		var filter = m => m.author.id === message.author.id;
 

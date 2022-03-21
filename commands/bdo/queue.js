@@ -12,7 +12,7 @@ module.exports = {
 			try {
 				queue_list = JSON.parse(fs.readFileSync(config.queue_folder, "utf8"));
 			} catch (err) {
-				print_e("[ERROR/queue.js]" + err.message);
+				print_e("[ERROR/queue.js] " + err.message);
 			}
 			let items = queue_list.items || [];
 			if (items.length > 0) {
@@ -33,12 +33,12 @@ module.exports = {
 						}
 					});
 				} catch (e) {
-					print_e("[ERROR/queue.js]: Cannot send message, "+e.message);
+					print_e("[ERROR/queue.js] Cannot send message, "+e.message);
 				}
 			} else return message.reply("очередь аукциона пуста!").then(m => m.delete({ timeout: 10000 }))	
 		}
 		catch (e) {
-			print_e("[ERROR/queue.js]: "+e.message)
+			print_e("[ERROR/queue.js] "+e.message)
 			return message.reply("непредвиденная ошибка! Попробуйте позже.").then(m => m.delete({ timeout: 10000 }))
 		};		
     }
