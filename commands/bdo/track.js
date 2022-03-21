@@ -1,6 +1,5 @@
 const { printError, declOfNum } = require("../../functions.js");
 const fs = require("fs");
-const { MessageCollector } = require("discord.js");
 
 function getAllTracked(message, config, configurations_list) {
     let local_config = configurations_list.find(server => server.guild == message.guild.id);

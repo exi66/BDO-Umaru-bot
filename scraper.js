@@ -45,7 +45,7 @@ module.exports = (config, client) => {
                                     try {
                                         let local_channel = client.channels.cache.get(local_guild.coupons);
                                         if (local_channel) local_channel.send({
-                                            content: `<@&${local_guild["coupons-role"]}>`,
+                                            content: `<@&${local_guild.coupons_role}>`,
                                             embed: {
                                                 color: "#2f3136",
                                                 title: "Купоны",

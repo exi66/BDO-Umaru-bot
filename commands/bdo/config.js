@@ -31,7 +31,7 @@ module.exports = {
                 embed: {
                     color: "#2f3136",
                     title: "Конфигурация сервера",
-                    description: `guild: \`${local_config.guild}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons-role: \`${local_config["coupons-role"] || " "}\``
+                    description: `guild: \`${local_config.guild}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons_role: \`${local_config.coupons_role || " "}\``
                 }
             });
         }
@@ -48,8 +48,8 @@ module.exports = {
                 case "coupons":
                     local_config.coupons = args[2];
                     break;  
-                case "coupons-role":
-                    local_config["coupons-role"] = args[2];
+                case "coupons_role":
+                    local_config.coupons_role = args[2];
                     break;
                 case "premium":
                     if (message.author.id == config.root) local_config.premium = args[2] == "true" ? true : false;
