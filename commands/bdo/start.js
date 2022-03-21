@@ -134,7 +134,7 @@ function save(config, configurations_list, local_config) {
 
 module.exports = {
     name: "start",
-	category: "bdo",
+	  category: "bdo",
     description: "Быстрое начало работы",
     run: async(client, message, args, config) => {
 
