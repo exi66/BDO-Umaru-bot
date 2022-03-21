@@ -29,11 +29,11 @@ module.exports = {
 				} catch (e) {
 					printError("ERROR/coupones.js", e.message);
 				}						
-			} else return message.reply("нет доступных купонов(").then(m => m.delete({ timeout: 10000 }))	
+			} else return message.reply("нет доступных купонов");
 		}
 		catch (e) {
 			printError("ERROR/coupones.js", e.message);
-			return message.reply("непредвиденная ошибка! Попробуйте позже.").then(m => m.delete({ timeout: 10000 }))
+			return message.reply("непредвиденная ошибка! Попробуйте позже.");
 		};		
     }
 }

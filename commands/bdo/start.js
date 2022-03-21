@@ -111,6 +111,7 @@ async function createConfigAuto(message) {
 
 function createConfigEmpty(message) {
 	var local_config 	= TEMPLATE.CONFIG;
+
 	local_config.items 	= [];
 	local_config.guild 	= message.guild.id;
 
@@ -138,8 +139,7 @@ module.exports = {
     run: async(client, message, args, config) => {
 
         if (!message.member.hasPermission("ADMINISTRATOR")) {
-			all_messages.forEach(e => e.delete({ timeout: 10000 }));
-			return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
+			return message.reply("у вас нет прав использовать эту команду.");
 		}
 
         var configurations_list = [];

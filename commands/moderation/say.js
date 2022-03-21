@@ -5,7 +5,7 @@ module.exports = {
 	category: "moderation",
     aliases: ["bc", "broadcast"],
     description: "Бот говорит за вас",
-    usage: "<input>",
+    usage: "[embed] <message>",
     run: (client, message, args) => {
         if (!message.member.hasPermission("MANAGE_MESSAGES"))
             return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));

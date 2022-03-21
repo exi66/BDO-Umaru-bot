@@ -1,5 +1,5 @@
 const request = require("request-promise-native");
-const { print_e } = require("../../functions.js");
+const { printError } = require("../../functions.js");
 
 module.exports = {
     name: "umaru",
@@ -16,8 +16,8 @@ module.exports = {
 			}
 		}).then(body => {
 			let data = JSON.parse(body);	
-			let answer = data.results[0].url || "ничего найдено(";
+			let answer = data.results[0].url || "ничего найдено :(";
 			message.channel.send(answer);
-		}).catch(function(e) { print_e("[ERROR/umaru.js] Request error, "+e.message); });;
+		}).catch(function(e) { printError("ERROR/umaru.js", "request error, "+e.message); });;
     }
 }

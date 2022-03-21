@@ -35,11 +35,11 @@ module.exports = {
 				} catch (e) {
 					printError("ERROR/queue.js", "cannot send message, "+e.message);
 				}
-			} else return message.reply("очередь аукциона пуста!").then(m => m.delete({ timeout: 10000 }))	
+			} else return message.reply("очередь аукциона пуста!");	
 		}
 		catch (e) {
 			printError("ERROR/queue.js", e.message)
-			return message.reply("непредвиденная ошибка! Попробуйте позже.").then(m => m.delete({ timeout: 10000 }))
+			return message.reply("непредвиденная ошибка! Попробуйте позже.");
 		};		
     }
 }

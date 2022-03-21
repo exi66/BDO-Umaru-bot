@@ -233,10 +233,6 @@ module.exports = {
         if (!local_config)
             return message.reply("конфигурация сервера отсутствует, использование невозможно!");
 
-        //if (!local_config.premium)
-            //return message.reply("сервер не премиум, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
-	    //cheak, can server use this command or not. You can delete this, if want use bot only for yourself.
-
         if (args.length <= 0) return getAllTracked(message, config, configurations_list);
 
 		args = args.map(e => e.toLowerCase());
