@@ -8,6 +8,5 @@ module.exports = {
         msg.edit(`🏓 Pong!
         Задержка ${Math.floor(msg.createdAt - message.createdAt)}ms
         Задержка API ${Math.round(client.ws.ping)}ms`);
-        msg.delete({ timeout: 10000 });
     }
 }

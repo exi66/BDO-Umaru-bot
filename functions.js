@@ -1,7 +1,7 @@
 module.exports = {
 	
-	print_e: function(str) {
-		console.log(`[${new Date().toLocaleString("en-GB")}] ${str}`);
+	printError: function(where, message) {
+		console.log(`[${new Date().toLocaleString("en-GB")}] [${where}] ${message}`);
 	},
 	
 	escapeMarkdown: function(text) {

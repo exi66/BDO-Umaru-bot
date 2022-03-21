@@ -1,4 +1,4 @@
-const { print_e } = require("../../functions.js");
+const { printError } = require("../../functions.js");
 const fs = require("fs");
 const { MessageAttachment } = require('discord.js')
 
@@ -7,31 +7,29 @@ module.exports = {
 	category: "bdo",
     aliases: ["conf"],
     description: "Управляет конфигурацией сервера",
-    usage: "<edit> <key> <value>",
+    usage: "<edit> <key> <value> | [json]",
     run: async(client, message, args, config) => {
         if (!message.member.hasPermission("ADMINISTRATOR")) {
-            message.delete({ timeout: 10000 });
-            return message.reply("у вас нет прав использовать эту команду!").then(m => m.delete({ timeout: 10000 }));
+            return message.reply("у вас нет прав использовать эту команду!");
         }
 
         var configurations_list = [];
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
-		} catch (err) {
-			print_e("[ERROR/config.js]" + err.message);
+		} catch (e) {
+			printError("ERROR/config.js", e.message);
 		}
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
 
         if (!local_config) {
-            message.delete({ timeout: 10000 });
-            return message.reply("конфигурация сервера отсутствует, использование не возможно!").then(m => m.delete({ timeout: 10000 }));
+            return message.reply("конфигурация сервера отсутствует, использование не возможно!");
         }
         if (args.length <= 0) {
             return message.channel.send({
                 embed: {
                     color: "#2f3136",
                     title: "Конфигурация сервера",
-                    description: `guild: \`${local_config.guild}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons-role: \`${local_config["coupons-role"] || " "}\``
+                    description: `guild: \`${local_config.guild}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons_role: \`${local_config.coupons_role || " "}\``
                 }
             });
         }
@@ -48,24 +46,22 @@ module.exports = {
                 case "coupons":
                     local_config.coupons = args[2];
                     break;  
-                case "coupons-role":
-                    local_config["coupons-role"] = args[2];
+                case "coupons_role":
+                    local_config.coupons_role = args[2];
                     break;
                 case "premium":
                     if (message.author.id == config.root) local_config.premium = args[2] == "true" ? true : false;
                     break;      
                 default:
-                    return message.channel.send("Неизвестный параметр! Изменять можно только `category`, `queue`, `coupons`, `coupons-role`.").then(m => m.delete({ timeout: 10000 }));
+                    return message.channel.send("Неизвестный параметр! Изменять можно только `category`, `queue`, `coupons`, `coupons_role`");
             }
-            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function (err) {
-                if (err) {
-                    message.delete({ timeout: 10000 });
-                    message.channel.send("Ошибка!").then(m => m.delete({ timeout: 10000 }));
-                    return print_e("[ERROR/config.js] " + err.message);
+            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
+                if (e) {
+                    message.channel.send("Ошибка!");
+                    return printError("ERROR/config.js", e.message);
                 }
             });
-            message.delete({ timeout: 10000 });
-            return message.channel.send("Изменено и сохранено!").then(m => m.delete({ timeout: 10000 }));
+            return message.channel.send("Изменено и сохранено!");
         } else if(args[0] === "json") {
             let buffer = Buffer.from(JSON.stringify(local_config, null, 4));
             let attachment = new MessageAttachment(buffer, 'config.json');

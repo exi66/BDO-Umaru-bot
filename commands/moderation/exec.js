@@ -1,9 +1,7 @@
-const { print_e } = require("../../functions.js");
-
 module.exports = {
     name: "exec",
 	category: "moderation",
-    aliases: ["e", "exe"],
+    aliases: ["e", "exe", "eval"],
     description: "Execute command",
     usage: "<cmd>",
     run: (client, message, args, config) => {

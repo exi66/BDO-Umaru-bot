@@ -1,4 +1,4 @@
-const { print_e } = require("../../functions.js");
+const { printError } = require("../../functions.js");
 const fs = require("fs");
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
 			try {
 				coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
 			} catch (err) {
-				print_e("[ERROR/coupones.js]" + err.message);
+				printError("ERROR/coupones.js", e.message);
 			}
 			if (coupons_list.length > 0) {
 				let codes = coupons_list.map(e => "`" + e + "`").join("\n");
@@ -27,13 +27,13 @@ module.exports = {
 						}
 					});
 				} catch (e) {
-					print_e("[ERROR/coupones.js]: "+e.message);
+					printError("ERROR/coupones.js", e.message);
 				}						
-			} else return message.reply("нет доступных купонов(").then(m => m.delete({ timeout: 10000 }))	
+			} else return message.reply("нет доступных купонов");
 		}
 		catch (e) {
-			print_e("[ERROR/coupones.js]: "+e.message)
-			return message.reply("непредвиденная ошибка! Попробуйте позже.").then(m => m.delete({ timeout: 10000 }))
+			printError("ERROR/coupones.js", e.message);
+			return message.reply("непредвиденная ошибка! Попробуйте позже.");
 		};		
     }
 }

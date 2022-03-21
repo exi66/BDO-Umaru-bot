@@ -39,6 +39,6 @@ module.exports = {
         if (member.user.presence.game) 
             embed.addField('В игре', stripIndents`**> Название:** ${member.user.presence.game.name}`);
 
-        return message.channel.send(embed).then(m => m.delete({ timeout: 10000 }));
+        return message.channel.send(embed);
     }
 }
