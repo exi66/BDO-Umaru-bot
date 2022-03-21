@@ -1,5 +1,5 @@
-const fs = require("fs");
 const { print_e } = require("../../functions.js");
+const fs = require("fs");
 
 module.exports = {
     name: "start",
