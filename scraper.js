@@ -75,30 +75,30 @@ module.exports = (config, client) => {
                             fs.writeFile(config.queue_folder, JSON.stringify(data, null, 4), function(e) {
                                 if (e) return printError("ERROR/scraper.js", "cannot save queue, "+err.message);
                             });
-                            let items = data["items"];
+                            let items = data.items;
                             //let lastupdate = data["lastUpdate"];
                             if (items.length > 0) {
                                 let queue_configurations_list = configurations_list.filter(e => e.queue.trim());
                                 for (let local_guild of queue_configurations_list) {
                                     let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
-                                    for (let local_items of local_guild["items"]) {
+                                    for (let local_items of local_guild.items) {
                                         for (let item of items) {		
-                                            if(local_items["ids"].includes(parseInt(item[0])) && item[1] == local_items["enchant"]) {
+                                            if(local_items.ids.includes(parseInt(item[0])) && item[1] == local_items.enchant) {
                                                 important_items_list.push(item);
-                                                if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
-                                                lvls += item[1]+"\n";
-                                                names += item[4]+"\n";
-                                                let date = new Date(item[3] * 1000);
-                                                let hours = date.getHours();
+                                                if (!mentions.includes(local_items.role)) mentions += `<@&${local_items.role}>`;
+                                                lvls        += item[1]+"\n";
+                                                names       += item[4]+"\n";
+                                                let date    = new Date(item[3] * 1000);
+                                                let hours   = date.getHours();
                                                 let minutes = "0" + date.getMinutes();
                                                 let seconds = "0" + date.getSeconds();
-                                                times += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
+                                                times       += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
                                             }										
                                         }
                                     }
                                     if (important_items_list.length > 0) {						
                                         try {
-                                            let local_channel = client.channels.cache.get(local_guild["queue"]);
+                                            let local_channel = client.channels.cache.get(local_guild.queue);
                                             if (local_channel) local_channel.send({
                                                 content: mentions,
                                                 embed: {
