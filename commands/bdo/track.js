@@ -1,6 +1,10 @@
 const { printError, declOfNum } = require("../../functions.js");
 const fs = require("fs");
 
+const where = __filename.slice(__dirname.length + 1);
+const error_here = where+"/error";
+const log_here = where+"/log";
+
 function getAllTracked(message, config, configurations_list) {
     let local_config = configurations_list.find(server => server.guild == message.guild.id);
     if (local_config.items.length == 0) return "список отслеживаемых товаров пуст!";
@@ -72,13 +76,13 @@ async function removeTracked(message, config, configurations_list) {
                         }
                         fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
                             if (e) {
-                                printError("ERROR/track.js", e.message);
+                                printError(error_here, e.message);
                                 return { error: "Ошибка!" };
                             }
                         });
                         return { message: "Удалено!" };
                     } catch (e) {
-                        printError("ERROR/track.js", e.message);
+                        printError(error_here, e.message);
                         return { error: "Ошибка!" };
                     }
                 }
@@ -95,13 +99,13 @@ async function removeTracked(message, config, configurations_list) {
             fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
                 if (e) {
                     message.channel.send("Ошибка!");
-                    return printError("ERROR/track.js", e.message);
+                    return printError(error_here, e.message);
                 }
             });
             return message.channel.send("Удалено!");
         } catch (e) {
             message.channel.send("Ошибка!");
-            return printError("ERROR/track.js", e.message);
+            return printError(error_here, e.message);
         }                        
     }
     else return message.channel.send("Не удалось найти такую зависимость!");
@@ -164,13 +168,13 @@ function addTracked(message, config, configurations_list) {
                         local_config.items.push(new_item);
                         fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
                             if (e) {
-                                printError("ERROR/track.js", e.message);
+                                printError(error_here, e.message);
                                 return { error: "Ошибка!" }
                             }
                         });
                         return { message: "Создано!" }
                     } catch (e) {
-                        printError("ERROR/track.js", e.message);
+                        printError(error_here, e.message);
                         return { error: "Ошибка!" }
                     }
                 } else {
@@ -226,7 +230,7 @@ module.exports = {
         try {
             configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
         } catch (e) {
-            printError("ERROR/track.js", e.message);
+            printError(error_here, e.message);
         }
         local_config = configurations_list.find(server => server.guild == message.guild.id);
 

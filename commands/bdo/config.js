@@ -2,6 +2,10 @@ const { printError } = require("../../functions.js");
 const fs = require("fs");
 const { MessageAttachment } = require('discord.js')
 
+const where = __filename.slice(__dirname.length + 1);
+const error_here = where+"/error";
+const log_here = where+"/log";
+
 module.exports = {
     name: "config",
 	category: "bdo",
@@ -17,7 +21,7 @@ module.exports = {
 		try {
 			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
 		} catch (e) {
-			printError("ERROR/config.js", e.message);
+			printError(error_here, e.message);
 		}
         var local_config = configurations_list.find(server => server.guild == message.guild.id);
 
@@ -58,7 +62,7 @@ module.exports = {
             fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
                 if (e) {
                     message.channel.send("Ошибка!");
-                    return printError("ERROR/config.js", e.message);
+                    return printError(error_here, e.message);
                 }
             });
             return message.channel.send("Изменено и сохранено!");

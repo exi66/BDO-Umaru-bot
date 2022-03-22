@@ -1,6 +1,10 @@
 const { printError } = require("../../functions.js");
 const fs = require("fs");
 
+const where = __filename.slice(__dirname.length + 1);
+const error_here = where+"/error";
+const log_here = where+"/log";
+
 module.exports = {
     name: "queue",
 	category: "bdo",
@@ -12,7 +16,7 @@ module.exports = {
 			try {
 				queue_list = JSON.parse(fs.readFileSync(config.queue_folder, "utf8"));
 			} catch (e) {
-				printError("ERROR/queue.js", e.message);
+				printError(error_here, e.message);
 			}
 			let items = queue_list.items || [];
 			if (items.length > 0) {
@@ -33,12 +37,12 @@ module.exports = {
 						}
 					});
 				} catch (e) {
-					printError("ERROR/queue.js", "cannot send message, "+e.message);
+					printError(error_here, "cannot send message, "+e.message);
 				}
 			} else return message.reply("очередь аукциона пуста!");	
 		}
 		catch (e) {
-			printError("ERROR/queue.js", e.message)
+			printError(error_here, e.message)
 			return message.reply("непредвиденная ошибка! Попробуйте позже.");
 		};		
     }

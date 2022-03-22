@@ -2,23 +2,27 @@ const { printError, declOfNum } = require("./functions.js");
 const { Client, Collection } = require("discord.js");
 const fs = require("fs");
 
+const where = __filename.slice(__dirname.length + 1);
+const error_here = where+"/error";
+const log_here = where+"/log";
+
 function checkAndRemove(config, client) {
     var configurations_list = [];
     try {
         configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
     } catch (e) {
-        printError("ERROR/bot.js/checkAndRemove", e.message);
+        printError(error_here, e.message);
     }
     if (configurations_list.length < 1) return;
     var guilds = client.guilds.cache.map(guild => guild.id);
     for (let i = 0; i < configurations_list.length; i++) {
         if (!guilds.includes(configurations_list[i].guild)) {
-            printError("bot.js/checkAndRemove", "found removed guild: "+configurations_list[i].guild);
+            printError(log_here, "found removed guild: "+configurations_list[i].guild);
             configurations_list.splice(i, 1);
         }
     }
     fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
-        if (e) return printError("bot.js/checkAndRemove", e.message);
+        if (e) return printError(error_here, e.message);
     });	
 }
 
@@ -33,17 +37,17 @@ module.exports = (config) => {
         require(`./handlers/${handler}`)(client);
     });
     client.on("ready", () => {
-        printError("bot.js", `${client.user.username} is now online!`);
+        printError(log_here, `${client.user.username} is now online!`);
         client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
         checkAndRemove(config, client);
     });
     client.on("guildCreate", guild => {
-        printError("bot.js", `joined a new guild: ${guild.name}`);
+        printError(log_here, `joined a new guild: ${guild.name}`);
         client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
         checkAndRemove(config, client);
     });
     client.on("guildDelete", guild => {
-        printError("bot.js", `left a guild: ${guild.name}`);
+        printError(log_here, `left a guild: ${guild.name}`);
         client.user.setActivity(`${client.guilds.cache.size} ${declOfNum(client.guilds.cache.size, ["сервер", "сервера", "серверов"])} • ${config.prefix}help`, { type: 'PLAYING' });
         checkAndRemove(config, client);
     });
