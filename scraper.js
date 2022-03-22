@@ -2,18 +2,22 @@ const { printError } = require("./functions.js");
 const request = require("request-promise-native");
 const fs = require("fs");
 
+const where = __filename.slice(__dirname.length + 1);
+const error_here = where+"/error";
+const log_here = where+"/log";
+
 module.exports = (config, client) => {
     return setInterval(function() {
         var configurations_list = [], coupons_list = [];
         try {
             configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
         } catch (e) {
-            printError("ERROR/scraper.js/read_servers", e.message);
+            printError(error_here, e.message);
         }
         try {
             coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
         } catch (e) {
-            printError("ERROR/scraper.js/read_coupons", e.message);
+            printError(error_here, e.message);
         }
         try {
             if (configurations_list.length > 0) {
@@ -29,7 +33,7 @@ module.exports = (config, client) => {
                         if (body !== "" && body != null) {	
                             let div = body.match(/<([^\s]+).*?id="text-15".*?>(.+?)<\/\1>/g);
                             let search = div[0].match(/\(?[a-zA-Z0-9]{4}\)?-?[a-zA-Z0-9]{4}?-?[a-zA-Z0-9]{4}-?[a-zA-Z0-9]{4}/gm);
-                            if (!search) return printError("ERROR/scraper.js", "div with coupones not found, need to edit regex");
+                            if (!search) return printError(error_here, "div with coupones not found, need to edit regex");
                             let all_coupones_list = [], new_coupones_list = [];
                             for (let c of search) {
                                 if (!all_coupones_list.includes(c.toUpperCase())) all_coupones_list.push(c.toUpperCase());
@@ -37,7 +41,7 @@ module.exports = (config, client) => {
                             }							
                             if (new_coupones_list.length > 0) {
                                 fs.writeFile(config.coupons_folder, JSON.stringify(all_coupones_list, null, 4), function(e) {
-                                    if (e) return printError("ERROR/scraper.js", "cannot save all coupones, "+err.message);
+                                    if (e) return printError(error_here, "cannot save all coupones, "+err.message);
                                 });
                                 let codes = coupons_list.map(e => "`" + e + "`").join("\n");
                                 let coupons_configurations_list = configurations_list.filter(e => e.coupons.trim());
@@ -55,12 +59,12 @@ module.exports = (config, client) => {
                                             }
                                         });
                                     } catch (e) {
-                                        printError("ERROR/scraper.js", "cannot send new coupones, "+e.message);
+                                        printError(error_here, "cannot send new coupones, "+e.message);
                                     }
                                 }							
                             }
                         }
-                    }).catch(function(e) { printError("ERROR/scraper.js", "coupons request error, "+e.message) });
+                    }).catch(function(e) { printError(error_here, "coupons request error, "+e.message) });
                 }
                 if (config.queue) {					
                     request({
@@ -73,7 +77,7 @@ module.exports = (config, client) => {
                         if (body !== "" && body != null) {
                             let data = JSON.parse(body);
                             fs.writeFile(config.queue_folder, JSON.stringify(data, null, 4), function(e) {
-                                if (e) return printError("ERROR/scraper.js", "cannot save queue, "+err.message);
+                                if (e) return printError(error_here, "cannot save queue, "+err.message);
                             });
                             let items = data.items;
                             //let lastupdate = data["lastUpdate"];
@@ -113,17 +117,17 @@ module.exports = (config, client) => {
                                                 }
                                             });
                                         } catch (e) {
-                                            printError("ERROR/scraper.js", "cannot send queue, "+e.message);
+                                            printError(error_here, "cannot send queue, "+e.message);
                                         }									
                                     }
                                 }							
                             }
                         }
-                    }).catch(function(e) { printError("ERROR/scraper.js", "queue request error, "+e.message) });
+                    }).catch(function(e) { printError(error_here, "queue request error, "+e.message) });
                 }
             }
         } catch (e) {
-            printError("ERROR/scraper.js", "general try-catch error, "+e.message);
+            printError(error_here, "general try-catch error, "+e.message);
         }
     }, config.debug ? 10*1000 : 5*60*1000);        
 }

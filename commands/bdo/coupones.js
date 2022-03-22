@@ -1,6 +1,10 @@
 const { printError } = require("../../functions.js");
 const fs = require("fs");
 
+const where = __filename.slice(__dirname.length + 1);
+const error_here = where+"/error";
+const log_here = where+"/log";
+
 module.exports = {
     name: "coupones",
 	category: "bdo",
@@ -11,8 +15,8 @@ module.exports = {
 			var coupons_list = [];
 			try {
 				coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
-			} catch (err) {
-				printError("ERROR/coupones.js", e.message);
+			} catch (e) {
+				printError(error_here, e.message);
 			}
 			if (coupons_list.length > 0) {
 				let codes = coupons_list.map(e => "`" + e + "`").join("\n");
@@ -27,12 +31,12 @@ module.exports = {
 						}
 					});
 				} catch (e) {
-					printError("ERROR/coupones.js", e.message);
+					printError(error_here, e.message);
 				}						
 			} else return message.reply("нет доступных купонов");
 		}
 		catch (e) {
-			printError("ERROR/coupones.js", e.message);
+			printError(error_here, e.message);
 			return message.reply("непредвиденная ошибка! Попробуйте позже.");
 		};		
     }

@@ -1,6 +1,10 @@
 const request = require("request-promise-native");
 const { printError } = require("../../functions.js");
 
+const where = __filename.slice(__dirname.length + 1);
+const error_here = where+"/error";
+const log_here = where+"/log";
+
 module.exports = {
     name: "umaru",
 	category: "fun",
@@ -15,9 +19,8 @@ module.exports = {
 				"User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
 			}
 		}).then(body => {
-			let data = JSON.parse(body);	
-			let answer = data.results[0].url || "ничего найдено :(";
+			let answer = JSON.parse(body).results[0].url || "ничего не найдено :(";
 			message.channel.send(answer);
-		}).catch(function(e) { printError("ERROR/umaru.js", "request error, "+e.message); });;
+		}).catch(function(e) { printError(error_here, "request error, "+e.message) });
     }
 }
