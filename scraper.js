@@ -1,27 +1,19 @@
 const { printError } = require("./functions.js");
 const request = require("request-promise-native");
-const fs = require("fs");
 
 const where = __filename.slice(__dirname.length + 1);
 const error_here = where+"/error";
 const log_here = where+"/log";
 
-module.exports = (config, client) => {
+module.exports = (client) => {
     return setInterval(function() {
-        var configurations_list = [], coupons_list = [];
-        try {
-            configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
-        } catch (e) {
-            printError(error_here, e.message);
-        }
-        try {
-            coupons_list = JSON.parse(fs.readFileSync(config.coupons_folder, "utf8"));
-        } catch (e) {
-            printError(error_here, e.message);
-        }
+        var configurations_list = [];
+        client.guilds.cache.forEach((g) => {
+            if (g.umaru) configurations_list.push(g);
+        });
         try {
             if (configurations_list.length > 0) {
-                if (config.coupons) {	
+                if (client.umaru.coupons) {	
                     request({
                         method: "GET",
                         url: "https://orbit-games.com/",
@@ -40,19 +32,18 @@ module.exports = (config, client) => {
                                 if (!coupons_list.includes(c.toUpperCase())) new_coupones_list.push(c.toUpperCase());
                             }							
                             if (new_coupones_list.length > 0) {
-                                fs.writeFile(config.coupons_folder, JSON.stringify(all_coupones_list, null, 4), function(e) {
-                                    if (e) return printError(error_here, "cannot save all coupones, "+err.message);
-                                });
+                                client.setCoupons(all_coupones_list);
                                 let codes = coupons_list.map(e => "`" + e + "`").join("\n");
-                                let coupons_configurations_list = configurations_list.filter(e => e.coupons.trim());
+                                let coupons_configurations_list = configurations_list.filter(g => g.umaru.coupons);
                                 for (let local_guild of coupons_configurations_list) {						
                                     try {
-                                        let local_channel = client.channels.cache.get(local_guild.coupons);
+                                        const local_channel = client.channels.cache.get(local_guild.umaru.coupons.id);
+                                        const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
                                         if (local_channel) local_channel.send({
                                             content: `<@&${local_guild.coupons_role}>`,
                                             embed: {
                                                 color: "#2f3136",
-                                                title: "Купоны",
+                                                title: lang.cmd.COUPONES.EMBED.TITLE,
                                                 url: "https://orbit-games.com/",
                                                 timestamp: new Date(),
                                                 description: codes
@@ -66,68 +57,75 @@ module.exports = (config, client) => {
                         }
                     }).catch(function(e) { printError(error_here, "coupons request error, "+e.message) });
                 }
-                if (config.queue) {					
-                    request({
-                        method: "GET",
-                        url: "http://veliainn.com/api/market-queue/ru",
-                        headers: {
-                            "User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
-                        }
-                    }).then(body => {
-                        if (body !== "" && body != null) {
-                            let data = JSON.parse(body);
-                            fs.writeFile(config.queue_folder, JSON.stringify(data, null, 4), function(e) {
-                                if (e) return printError(error_here, "cannot save queue, "+err.message);
-                            });
-                            let items = data.items;
-                            //let lastupdate = data["lastUpdate"];
-                            if (items.length > 0) {
-                                let queue_configurations_list = configurations_list.filter(e => e.queue.trim());
-                                for (let local_guild of queue_configurations_list) {
-                                    let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
-                                    for (let local_items of local_guild.items) {
-                                        for (let item of items) {		
-                                            if(local_items.ids.includes(parseInt(item[0])) && item[1] == local_items.enchant) {
-                                                important_items_list.push(item);
-                                                if (!mentions.includes(local_items.role)) mentions += `<@&${local_items.role}>`;
-                                                lvls        += item[1]+"\n";
-                                                names       += item[4]+"\n";
-                                                let date    = new Date(item[3] * 1000);
-                                                let hours   = date.getHours();
-                                                let minutes = "0" + date.getMinutes();
-                                                let seconds = "0" + date.getSeconds();
-                                                times       += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
-                                            }										
-                                        }
-                                    }
-                                    if (important_items_list.length > 0) {						
-                                        try {
-                                            let local_channel = client.channels.cache.get(local_guild.queue);
-                                            if (local_channel) local_channel.send({
-                                                content: mentions,
-                                                embed: {
-                                                    color: "#2f3136",
-                                                    title: "Очередь аукциона",
-                                                    timestamp: new Date(),
-                                                    fields: [
-                                                        { name: "lvl", value: lvls, inline: true},
-                                                        { name: "Название", value: names, inline: true},
-                                                        { name: "Время", value: times, inline: true}
-                                                    ]
-                                                }
-                                            });
-                                        } catch (e) {
-                                            printError(error_here, "cannot send queue, "+e.message);
-                                        }									
-                                    }
-                                }							
+                if (client.umaru.queue) {	
+                    let guilds_regions = [];
+                    client.guilds.cache.forEach((g) => {
+                        if (g.umaru) guilds_regions.push(g.umaru.region);
+                    });
+                    var intersection = client.umaru.regions.filter(e => guilds_regions.includes(e));
+                    for (let reg of intersection) {
+                        request({
+                            method: "GET",
+                            url: encodeURI(`http://veliainn.com/api/market-queue/${reg}`),
+                            headers: {
+                                "User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
                             }
-                        }
-                    }).catch(function(e) { printError(error_here, "queue request error, "+e.message) });
+                        }).then(body => {
+                            if (body !== "" && body != null) {
+                                let data = JSON.parse(body);
+                                data.region = reg;
+                                client.setQueue(data);
+                                let items = data.items;
+                                //let lastupdate = data["lastUpdate"];
+                                if (items.length > 0) {
+                                    let queue_configurations_list = configurations_list.filter(g => g.umaru.queue);
+                                    for (let local_guild of queue_configurations_list) {
+                                        let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
+                                        for (let local_items of local_guild.umaru.items) {
+                                            for (let item of items) {		
+                                                if(local_items.ids.includes(parseInt(item[0])) && item[1] == local_items.enchant) {
+                                                    important_items_list.push(item);
+                                                    if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
+                                                    lvls += item[1]+"\n";
+                                                    names += item[4]+"\n";
+                                                    let date = new Date(item[3] * 1000);
+                                                    let hours = date.getHours();
+                                                    let minutes = "0" + date.getMinutes();
+                                                    let seconds = "0" + date.getSeconds();
+                                                    times += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
+                                                }										
+                                            }
+                                        }
+                                        if (important_items_list.length > 0) {						
+                                            try {
+                                                const local_channel = client.channels.cache.get(local_guild.umaru.queue.id);
+                                                const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
+                                                if (local_channel) local_channel.send({
+                                                    content: mentions,
+                                                    embed: {
+                                                        color: "#2f3136",
+                                                        title: lang.cmd.QUEUE.EMBED.TITLE,
+                                                        timestamp: new Date(),
+                                                        fields: [
+                                                            { name: lang.cmd.QUEUE.EMBED.FIELDS.LVL, value: lvls, inline: true},
+                                                            { name: lang.cmd.QUEUE.EMBED.FIELDS.NAME, value: names, inline: true},
+                                                            { name: lang.cmd.QUEUE.EMBED.FIELDS.TIME, value: times, inline: true}
+                                                        ]
+                                                    }
+                                                });
+                                            } catch (e) {
+                                                printError(error_here, "cannot send queue, "+e.message);
+                                            }									
+                                        }
+                                    }							
+                                }
+                            }
+                        }).catch(function(e) { printError(error_here, "queue request error, "+e.message) });
+                    }
                 }
             }
         } catch (e) {
             printError(error_here, "general try-catch error, "+e.message);
         }
-    }, config.debug ? 10*1000 : 5*60*1000);        
+    }, client.umaru.debug ? 10*1000 : 5*60*1000);        
 }

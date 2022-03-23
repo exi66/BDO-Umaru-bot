@@ -8,8 +8,8 @@ const log_here = where+"/log";
 module.exports = {
     name: "umaru",
 	category: "fun",
-    description: "[ search request ]",
-    run: async (client, message, args) => {
+    usage: "[ search request ]",
+    run: async (client, message, args, lang) => {
 		message.delete();
 		let req = args.join(" ") || "umaru";
 		request({
@@ -19,7 +19,7 @@ module.exports = {
 				"User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
 			}
 		}).then(body => {
-			let answer = JSON.parse(body).results[0].url || "ничего не найдено :(";
+			let answer = JSON.parse(body).results[0].url || lang.cmd.NOT_FOUND;
 			message.channel.send(answer);
 		}).catch(function(e) { printError(error_here, "request error, "+e.message) });
     }

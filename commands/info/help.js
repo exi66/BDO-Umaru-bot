@@ -5,11 +5,11 @@ module.exports = {
     name: "help",
     category: "info",
 	aliases: ["h"],
-    description: "Информация о командах",
+    description: (lang) => { return lang.cmd.DESCRIPTION },
     usage: "[command | alias]",
-    run: async (client, message, args) => {
+    run: async (client, message, args, lang) => {
         if (args[0]) {
-            return getCMD(client, message, args[0]);
+            return getCMD(client, message, args[0], lang);
         } else {
             return getAll(client, message);
         }
@@ -34,23 +34,26 @@ function getAll(client, message) {
     return message.channel.send(embed.setDescription(info));
 }
 
-function getCMD(client, message, input) {
+function getCMD(client, message, input, lang) {
     const embed = new MessageEmbed()
 
     const cmd = client.commands.get(input.toLowerCase()) || client.commands.get(client.aliases.get(input.toLowerCase()));
     
-    let info = `Нет информации о команде **${input.toLowerCase()}**`;
+    let info = lang.cmd.INFO_EMPTY(input.toLowerCase());
 
     if (!cmd) {
         return message.channel.send(info);
     }
 
-    if (cmd.name) info = `**Команда**: ${cmd.name}`;
-    if (cmd.aliases) info += `\n**Алиасы**: ${cmd.aliases.map(a => `\`${a}\``).join(", ")}`;
-    if (cmd.description) info += `\n**Описание**: ${cmd.description}`;
+    if (cmd.name) info = lang.cmd.EMBED.INFO_NAME(cmd.name);
+    if (cmd.aliases) info += lang.cmd.EMBED.INFO_ALIASES(cmd.aliases.map(a => `\`${a}\``).join(", "));
+    if (cmd.description && cmd.name) {
+        let local_lang = { cmd: client.languages.get(lang.name)[cmd.name.toUpperCase()] };
+        info += lang.cmd.EMBED.INFO_DESCRIPTION(cmd.description(local_lang));
+    }
     if (cmd.usage) {
-        info += `\n**Использование**: ${cmd.usage}`;
-        embed.setFooter(`Синтаксис: <> = необходимо, [] = опционально`);
+        info += lang.cmd.EMBED.INFO_USAGE(cmd.usage);
+        embed.setFooter(lang.cmd.EMBED.FOOTER);
     }
 
     return message.channel.send(embed.setColor("#2f3136").setDescription(info));

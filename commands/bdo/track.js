@@ -1,48 +1,48 @@
 const { printError, declOfNum } = require("../../functions.js");
-const fs = require("fs");
 
 const where = __filename.slice(__dirname.length + 1);
 const error_here = where+"/error";
 const log_here = where+"/log";
 
-function getAllTracked(message, config, configurations_list) {
-    let local_config = configurations_list.find(server => server.guild == message.guild.id);
-    if (local_config.items.length == 0) return "список отслеживаемых товаров пуст!";
+function getAllTracked(client, message, lang) {
+    let local_config = client.getConfig(message.guild);
+    if (local_config.items.length < 1) return message.channel.send(lang.cmd.TRACKED_EMPTY);
     let items   = local_config.items.map(e => e.ids.slice(0, Math.min(5, e.ids.length)).join(", ")).join("\n");
     let roles   = local_config.items.map(e => "<@&"+e.role+">").join("\n");
     let lvls    = local_config.items.map(e => e.enchant).join("\n");
     return message.channel.send({
         embed: {
             color: "#2f3136",
-            title: "Отслеживаемые товары",
+            title: lang.cmd.EMBED.TITLE,
             fields: [
-                { name: "Роль", value: roles, inline: true},
-                { name: "id", value: items, inline: true},
-                { name: "lvl", value: lvls, inline: true},
+                { name: lang.cmd.EMBED.FIELDS.ROLE, value: roles, inline: true},
+                { name: lang.cmd.EMBED.FIELDS.ID, value: items, inline: true},
+                { name: lang.cmd.EMBED.FIELDS.LVL, value: lvls, inline: true},
             ]
         }
     });    
 }
 
-async function removeTracked(message, config, configurations_list) {
-    var local_config = configurations_list.find(server => server.guild == message.guild.id);
+async function removeTracked(client, message, lang) {
+    const removed = lang.cmd.REMOVED;
+    var local_config = client.getConfig(message.guild);
     var local_deleted;
     var questions = [
         {
-            question: "Упомяните роль, которую хотите перестать отслеживать или укажите ее id",
+            question: removed.QUESTION_1,
             before: () => {
 
             },
             after: (msg) => {
                 let role = msg.mentions.roles.first() || msg.guild.roles.cache.find(role => role.id === msg.content);
                 if (!role) {
-                    return { error: "Не удалось распознать роль!" };
+                    return { error: removed.ERROR_1 };
                 }
                 local_deleted = local_config.items.filter(e => e.role == role.id);
             }
         }
     ]
-    await sendQuestions(message, questions, 240000);
+    await sendQuestions(message, questions, 240000, lang);
     if (local_deleted.length > 1) {
         let nums    = local_deleted.map((e, i) => i+1).join("\n");
         let items   = local_deleted.map(e => e.ids.slice(0, Math.min(5, e.ids.length)).join(", ")).join("\n");
@@ -50,14 +50,14 @@ async function removeTracked(message, config, configurations_list) {
         questions = [
             {
                 question: {
-                    content: `Найдено ${local_deleted.length} ${declOfNum(local_deleted.length, ["зависимость", "зависимости", "зависимостей"])}. Какую удалить? (1-${local_deleted.length})`,
+                    content: removed.QUESTION_2(local_deleted.length),
                     embed: {
                         color: "#2f3136",
-                        title: "Найденные соответствия",
+                        title: removed.QUESTION_2_EMBED.TITLE,
                         fields: [
-                            { name: "№", value: nums, inline: true},
-                            { name: "id", value: items, inline: true},
-                            { name: "lvl", value: lvls, inline: true},
+                            { name: removed.QUESTION_2_EMBED.FIELDS.NUM, value: nums, inline: true},
+                            { name: removed.QUESTION_2_EMBED.FIELDS.ID, value: items, inline: true},
+                            { name: removed.QUESTION_2_EMBED.FIELDS.LVL, value: lvls, inline: true},
                         ]
                     }
                 },
@@ -67,28 +67,24 @@ async function removeTracked(message, config, configurations_list) {
                 after: (msg) => {
                     let local_index = parseInt(msg.content) || -1;
                     if (local_index === -1) {
-                        return { error: "Не удалось распознать роль!" };
+                        return { error: removed.ERROR_2 };
                     }
                     try {
                         let index = local_config.items.indexOf(local_deleted[local_index-1]);
                         if (index !== -1) {
                             local_config.items.splice(index, 1);
                         }
-                        fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
-                            if (e) {
-                                printError(error_here, e.message);
-                                return { error: "Ошибка!" };
-                            }
-                        });
-                        return { message: "Удалено!" };
+                        let save = client.setConfig(message.guild, local_config);
+                        if (!save) return { error: lang.global.ERROR }
+                        return { message: removed.SUCCESS };
                     } catch (e) {
                         printError(error_here, e.message);
-                        return { error: "Ошибка!" };
+                        return { error: lang.global.ERROR };
                     }
                 }
             }            
         ]
-        await sendQuestions(message, questions, 240000);                    
+        await sendQuestions(message, questions, 240000, lang);                    
     }
     else if (local_deleted.length == 1) {
         try {
@@ -96,26 +92,22 @@ async function removeTracked(message, config, configurations_list) {
             if (index !== -1) {
                 local_config.items.splice(index, 1);
             }
-            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
-                if (e) {
-                    message.channel.send("Ошибка!");
-                    return printError(error_here, e.message);
-                }
-            });
-            return message.channel.send("Удалено!");
+            let save = client.setConfig(message.guild, local_config);
+            if (!save) return { error: lang.global.ERROR }
+            return message.channel.send(removed.SUCCESS);
         } catch (e) {
-            message.channel.send("Ошибка!");
+            message.channel.send(lang.global.ERROR);
             return printError(error_here, e.message);
         }                        
     }
-    else return message.channel.send("Не удалось найти такую зависимость!");
+    else return message.channel.send(removed.ERROR_3);
 }
 
-function addTracked(message, config, configurations_list) {
-    var local_config = configurations_list.find(server => server.guild == message.guild.id);
+function addTracked(client, message, lang) {
+    const add = lang.cmd.ADD;
+    var local_config = client.getConfig(message.guild);
     if ((local_config.items.length >= 5) && !local_config.premium) {
-        all_messages.forEach(e => e.delete({ timeout: 10000 }));
-        return message.channel.send("Достигнут лимит на 5 отслеживаемых групп товаров для сервера! Удалите какую-нибудь группу для создания новой.").then(m => m.delete({ timeout: 10000 }));
+        return message.channel.send(add.LIMITE_ERROR);
     }
     var new_item = {
         role: "",
@@ -124,20 +116,20 @@ function addTracked(message, config, configurations_list) {
     }
     var questions = [
         {
-            question: "Какую роль упоминать? Укажите `id` или упомяните ее через `@role-name`",
+            question: add.QUESTION_1,
             before: () => {
 
             },
             after: (msg) => {
                 let role = msg.mentions.roles.first() || msg.guild.roles.cache.find(role => role.id === msg.content);
                 if (!role) {
-                    return { error: "Не удалось распознать роль!" };
+                    return { error: add.ERROR_1 };
                 }
                 return new_item.role = role.id;
             }
         },
         {
-            question: "Перечислите id необходимых для отслеживания предметов",
+            question: add.QUESTION_2,
             before: () => {
 
             },
@@ -147,18 +139,18 @@ function addTracked(message, config, configurations_list) {
             }
         },
         {
-            question: "Укажите уровень усиления (общий для всей группы ранее указанных предметов)",
+            question: add.QUESTION_3,
             before: () => {
 
             },
             after: (msg) => {
-                let enchant = parseInt(msg.content) || { error: "Не удалось распознать число!" };
+                let enchant = parseInt(msg.content) || { error: add.ERROR_3 };
                 if (enchant.message) return enchant;
                 return new_item.enchant = enchant;
             }
         },
         {
-            question: "Все верно? Да(Y)\/Нет(N)",
+            question: add.QUESTION_4,
             before: () => {
                 return { message: "```json\n"+JSON.stringify(new_item, null, 2)+"```" }
             },
@@ -166,27 +158,23 @@ function addTracked(message, config, configurations_list) {
                 if (msg.content.toLowerCase() === "y" || msg.content.toLowerCase() === "yes" || msg.content.toLowerCase() === "да") {
                     try {
                         local_config.items.push(new_item);
-                        fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
-                            if (e) {
-                                printError(error_here, e.message);
-                                return { error: "Ошибка!" }
-                            }
-                        });
-                        return { message: "Создано!" }
+                        let save = client.setConfig(message.guild, local_config);
+                        if (!save) return { error: lang.global.ERROR }
+                        return { message: add.SUCCESS }
                     } catch (e) {
                         printError(error_here, e.message);
-                        return { error: "Ошибка!" }
+                        return { error: lang.global.ERROR }
                     }
                 } else {
-                    return { error: "Команда отменена пользователем!" }
+                    return { error: lang.global.CANCEL }
                 }                
             }
         },
     ];
-    sendQuestions(message, questions, 240000);
+    sendQuestions(message, questions, 240000, lang);
 }
 
-async function sendQuestions(message, questions, timeout) {
+async function sendQuestions(message, questions, timeout, lang) {
     var all_messages = [];
     var filter = m => m.author.id === message.author.id;
     for (let quest of questions) {
@@ -201,7 +189,7 @@ async function sendQuestions(message, questions, timeout) {
             time: timeout,
             errors: ["time"]
         }).catch(() => {
-            return message.channel.send("Команда отменена по таймауту!");
+            return message.channel.send(lang.global.TIMEOUT);
         });
         let after = quest.after(m.first());
         all_messages.push(m.first());
@@ -219,31 +207,25 @@ module.exports = {
     name: "track",
 	category: "bdo",
     aliases: ["t"],
-    description: "Управляет отслеживанием аукциона",
+    description: (lang) => { return lang.cmd.DESCRIPTION },
     usage: "<add | remove>",
-    run: (client, message, args, config) => {
-        var configurations_list = [], local_config;
+    run: (client, message, args, lang) => {
 
         if (!message.member.hasPermission("ADMINISTRATOR"))
-            return message.reply("у вас нет прав использовать эту команду!");
+            return message.reply(lang.global.DONT_HAVE_PERMISSIONS);
 
-        try {
-            configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
-        } catch (e) {
-            printError(error_here, e.message);
-        }
-        local_config = configurations_list.find(server => server.guild == message.guild.id);
+        var local_config = client.getConfig(message.guild);
 
         if (!local_config)
-            return message.reply("конфигурация сервера отсутствует, использование невозможно!");
+            return message.reply(lang.cmd.DONT_HAVE_CONFIG);
 
-        if (args.length <= 0) return getAllTracked(message, config, configurations_list);
+        if (args.length <= 0) return getAllTracked(client, message, lang);
 
 		args = args.map(e => e.toLowerCase());
         if (args[0] === "add") {
-            addTracked(message, config, configurations_list);
+            addTracked(client, message, lang);
         } else if (args[0] === "remove" || args[0] === "rm") {
-            removeTracked(message, config, configurations_list);
+            removeTracked(client, message, lang);
         } 
         else {
             return;

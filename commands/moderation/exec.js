@@ -2,14 +2,14 @@ module.exports = {
     name: "exec",
 	category: "moderation",
     aliases: ["e", "exe", "eval"],
-    description: "Execute command",
+    description: (lang) => { return lang.cmd.DESCRIPTION },
     usage: "<cmd>",
-    run: (client, message, args, config) => {
-        if (!(message.author.id == config.root))
-            return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
+    run: (client, message, args, lang) => {
+        if (!(message.author.id == client.umaru.root))
+            return message.reply(lang.global.DONT_HAVE_PERMISSIONS);
 
         if (args.length <= 0)
-            return message.reply("нет команды").then(m => m.delete({ timeout: 10000 }));
+            return message.reply(lang.global.DONT_HAVE_ARGS);
 
         try {
             eval(args.join(" "));
