@@ -89,22 +89,22 @@ async function createConfigAuto(message, lang, flag, region) {
 
 	if (flag)
 		var coupons_role		= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.COUPONS);
-	var v_bs_role			 	= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_BS);
+	var v_bs_role			 	  = await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_BS);
 	var v_manos_role 			= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_MANOS);
-	var iv_deborika_role 		= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.IV_DEBORIKA);
-	var v_deborika_role 		= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_DEBORIKA);
-	var cat						= await message.guild.channels.create(lang.cmd.CATEGORY_NAME, { type: "category", permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
+	var iv_deborika_role 	= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.IV_DEBORIKA);
+	var v_deborika_role 	= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_DEBORIKA);
+	var cat						    = await message.guild.channels.create(lang.cmd.CATEGORY_NAME, { type: "category", permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
 	if (flag)
-		var coupons				= await message.guild.channels.create(lang.cmd.COUPONS_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
-	var queue		 			= await message.guild.channels.create(lang.cmd.QUEUE_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
+		var coupons				  = await message.guild.channels.create(lang.cmd.COUPONS_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
+	var queue		 			    = await message.guild.channels.create(lang.cmd.QUEUE_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
 	
-	local_config.lang 			= lang.name;
-	local_config.region 		= region;
-	local_config.guild 			= message.guild.id;
-	local_config.queue			= queue.id;
+	local_config.lang 			    = lang.name;
+	local_config.region 		    = region;
+	local_config.guild 			    = message.guild.id;
+	local_config.queue			    = queue.id;
 	if (flag)
-		local_config.coupons 	= coupons.id;
-	local_config.category 		= cat.id;
+		local_config.coupons 	    = coupons.id;
+	local_config.category 		  = cat.id;
 	if (flag)
 		local_config.coupons_role = coupons_role.id;
 	local_config.items[0].role 	= v_bs_role.id;
@@ -117,11 +117,11 @@ async function createConfigAuto(message, lang, flag, region) {
 
 module.exports = {
     name: "start",
-	category: "bdo",
+	  category: "bdo",
     description: (lang) => { return lang.cmd.DESCRIPTION },
     run: async(client, message, args, lang) => {
 
-        if (!message.member.hasPermission("ADMINISTRATOR")) {
+    if (!message.member.hasPermission("ADMINISTRATOR")) {
 			return message.reply(lang.global.DONT_HAVE_PERMISSIONS);
 		}
 		var all_messages = [];
