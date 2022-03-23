@@ -27,7 +27,7 @@
 This parameter can only be changed by the root user, whose id is specified in `config.json`
 
 With the same command, you can view the shortened config of the current server `!config` or the entire `!config json`.
-### Auxiliary commands
+### Others commands
 `!help [cmd name or alias]` prints all commands if there are no arguments and brief information about using the command if its name is specified in the argument
 `!exec <cmd>` executes the code following the command. The command is available only to the root user
 `!umaru [reques]` post a random GIF on request
