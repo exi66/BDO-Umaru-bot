@@ -1,11 +1,14 @@
 {
-    "token":  "", //bot token
-    "root": "", //root user, that can use exec command (bot hoster for example)
+    "token":  "",
+    "root": "",
     "prefix": "!!", 
     "coupons_folder": "./data/coupons.json",
     "queue_folder": "./data/queue.json",
     "servers_configs_folder": "./data/servers.json",
     "debug": false,
     "coupons": true,
-    "queue": true
+    "queue": true,
+    "default_lang": "ru",
+    "default_region": "ru",
+    "regions": ["ru", "eu", "na", "kr", "sea", "sa", "jp", "th", "tw"]
 }
