@@ -164,9 +164,14 @@ module.exports = (config) => {
         } catch (e) {
             printError(error_here, e.message);
         }
-        let elem = queue_list.find(e => e.region === array.region);  
-        if (elem) elem = array;
-        else queue_list.push(array);          
+		let flag = false;
+        for (let i = 0; i < queue_list.length; i++) {
+			if (queue_list[i].region === array.region) {
+				queue_list[i] = array;
+				flag = true;
+			}
+		}
+		if (!flag) queue_list.push(array);      
         fs.writeFile(client.umaru.queue_folder, JSON.stringify(queue_list, null, 4), function(e) {
             if (e) return printError(error_here, "cannot save all coupones, "+e.message);
         });
