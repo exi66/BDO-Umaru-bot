@@ -1,5 +1,4 @@
 const { printError } = require("../../functions.js");
-const fs = require("fs");
 const { MessageAttachment } = require('discord.js')
 
 const where = __filename.slice(__dirname.length + 1);
@@ -10,30 +9,23 @@ module.exports = {
     name: "config",
 	category: "bdo",
     aliases: ["conf"],
-    description: "Управляет конфигурацией сервера",
+    description: (lang) => { return lang.cmd.DESCRIPTION },
     usage: "<edit> <key> <value> | [json]",
-    run: async(client, message, args, config) => {
+    run: async(client, message, args, lang) => {
         if (!message.member.hasPermission("ADMINISTRATOR")) {
-            return message.reply("у вас нет прав использовать эту команду!");
+            return message.reply(lang.global.DONT_HAVE_PERMISSIONS);
         }
-
-        var configurations_list = [];
-		try {
-			configurations_list = JSON.parse(fs.readFileSync(config.servers_configs_folder, "utf8"));
-		} catch (e) {
-			printError(error_here, e.message);
-		}
-        var local_config = configurations_list.find(server => server.guild == message.guild.id);
-
+        var local_config = client.getConfig(message.guild);
+        var config = client.umaru;
         if (!local_config) {
-            return message.reply("конфигурация сервера отсутствует, использование не возможно!");
+            return message.reply(lang.cmd.DONT_HAVE_CONFIG);
         }
         if (args.length <= 0) {
             return message.channel.send({
                 embed: {
                     color: "#2f3136",
-                    title: "Конфигурация сервера",
-                    description: `guild: \`${local_config.guild}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons_role: \`${local_config.coupons_role || " "}\``
+                    title: lang.cmd.EMBED.TITLE,
+                    description: `guild: \`${message.guild.id}\`\nlang: \`${local_config.lang}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons_role: \`${local_config.coupons_role || " "}\``
                 }
             });
         }
@@ -55,17 +47,17 @@ module.exports = {
                     break;
                 case "premium":
                     if (message.author.id == config.root) local_config.premium = args[2] == "true" ? true : false;
+                    break;
+                case "lang":
+                    let langs = Array.from(client.languages.keys());
+                    local_config.lang = langs.includes(args[2]) ? args[2] : config.default_lang;
                     break;      
                 default:
-                    return message.channel.send("Неизвестный параметр! Изменять можно только `category`, `queue`, `coupons`, `coupons_role`");
+                    return message.channel.send(lang.cmd.EDIT_AND_SAVE);
             }
-            fs.writeFile(config.servers_configs_folder, JSON.stringify(configurations_list, null, 4), function(e) {
-                if (e) {
-                    message.channel.send("Ошибка!");
-                    return printError(error_here, e.message);
-                }
-            });
-            return message.channel.send("Изменено и сохранено!");
+            let save = client.setConfig(message.guild, local_config);
+            if (!save) return message.channel.send(lang.global.ERROR);
+            return message.channel.send(lang.cmd.EDIT_AND_SAVE);
         } else if(args[0] === "json") {
             let buffer = Buffer.from(JSON.stringify(local_config, null, 4));
             let attachment = new MessageAttachment(buffer, 'config.json');

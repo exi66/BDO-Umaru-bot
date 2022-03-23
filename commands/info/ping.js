@@ -1,12 +1,11 @@
 module.exports = {
     name: "ping",
 	category: "info",
-    description: "Возвращает задержку",
-    run: async (client, message, args) => {
+    run: async (client, message, args, lang) => {
         const msg = await message.channel.send(`Pinging....`);
 
         msg.edit(`🏓 Pong!
-        Задержка ${Math.floor(msg.createdAt - message.createdAt)}ms
-        Задержка API ${Math.round(client.ws.ping)}ms`);
+        ${lang.cmd.PING} ${Math.floor(msg.createdAt - message.createdAt)}ms
+        ${lang.cmd.PING} API ${Math.round(client.ws.ping)}ms`);
     }
 }

@@ -2,6 +2,8 @@ module.exports = {
 	
 	printError: function(where, message) {
 		console.log(`[${new Date().toLocaleString("en-GB")}] [${where}] ${message}`);
+        if (where.endsWith("/error")) return false;
+        return true;
 	},
 	
 	escapeMarkdown: function(text) {

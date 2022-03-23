@@ -1,5 +1,4 @@
 const { printError } = require("../../functions.js");
-const fs = require("fs");
 
 const where = __filename.slice(__dirname.length + 1);
 const error_here = where+"/error";
@@ -9,15 +8,10 @@ module.exports = {
     name: "queue",
 	category: "bdo",
     aliases: ["q", "que"],
-    description: "Выдает текущую очередь регистрации на аукционе",
-    run: (client, message, args, config) => {
+    description: (lang) => { return lang.cmd.DESCRIPTION },
+    run: (client, message, args, lang) => {
 		try {
-			var queue_list = [];
-			try {
-				queue_list = JSON.parse(fs.readFileSync(config.queue_folder, "utf8"));
-			} catch (e) {
-				printError(error_here, e.message);
-			}
+			var queue_list = client.getQueue();
 			let items = queue_list.items || [];
 			if (items.length > 0) {
 				let names = items.map(e => e[4]).join("\n"), 
@@ -27,23 +21,23 @@ module.exports = {
 					message.channel.send({
 						embed: {
 							color: "#2f3136",
-							title: "Очередь аукциона",
+							title: lang.cmd.EMBED.TITLE,
 							timestamp: new Date(queue_list.lastUpdate),
 							fields: [
-								{ name: "lvl", value: lvls, inline: true},
-								{ name: "Название", value: names, inline: true},
-								{ name: "Время", value: times, inline: true}
+								{ name: lang.cmd.EMBED.FIELDS.LVL, value: lvls, inline: true},
+								{ name: lang.cmd.EMBED.FIELDS.NAME, value: names, inline: true},
+								{ name: lang.cmd.EMBED.FIELDS.TIME, value: times, inline: true}
 							]
 						}
 					});
 				} catch (e) {
 					printError(error_here, "cannot send message, "+e.message);
 				}
-			} else return message.reply("очередь аукциона пуста!");	
+			} else return message.channel.send(lang.cmd.DONT_HAVE_ITEMS);	
 		}
 		catch (e) {
 			printError(error_here, e.message)
-			return message.reply("непредвиденная ошибка! Попробуйте позже.");
+			return message.channel.send(lang.global.ERROR);
 		};		
     }
 }

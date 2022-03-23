@@ -6,16 +6,16 @@ module.exports = {
     name: "whois",
 	category: "info",
     aliases: ["who", "user", "info"],
-    description: "Возвращает информацию о пользователе",
+    description: (lang) => { return lang.cmd.DESCRIPTION },
     usage: "[username | id | mention]",
-    run: (client, message, args) => {
+    run: (client, message, args, lang) => {
         const member = getMember(message, args.join(" "));
 
         // Member variables
         const joined = formatDate(member.joinedAt);
         const roles = member.roles.cache
             .filter(r => r.id !== message.guild.id)
-            .map(r => r).join(", ") || 'none';
+            .map(r => r).join(", ") || "none";
 
         // User variables
         const created = formatDate(member.user.createdAt);
@@ -23,21 +23,13 @@ module.exports = {
         const embed = new MessageEmbed()
             .setFooter(member.displayName, member.user.displayAvatarURL())
             .setThumbnail(member.user.displayAvatarURL({size: 2048}))
-            .setColor(member.displayHexColor === '#000000' ? '#ffffff' : member.displayHexColor)
+            .setColor(member.displayHexColor === "#000000" ? "#2f3136" : member.displayHexColor)
 
-            .addField('Информация:', stripIndents`**> Никнейм:** ${member.displayName}
-            **> Дата подключения:** ${joined}
-            **> Роли:** ${roles}`, true)
+            .addField(lang.cmd.EMBED.FIELDS.INFO, stripIndents(lang.cmd.EMBED.FIELDS.INFO_DESCRIPTION(member.displayName, joined, roles)), true)
 
-            .addField('Пользователь:', stripIndents`**> ID:** ${member.user.id}
-            **> Имя:** ${member.user.username}
-            **> Тэг:** ${member.user.tag}
-            **> Регистрация:** ${created}`, true)
+            .addField(lang.cmd.EMBED.FIELDS.USER, stripIndents(lang.cmd.EMBED.FIELDS.USER_DESCRIPTION(member.user.id, member.user.username, member.user.tag, created)), true)
             
             .setTimestamp()
-
-        if (member.user.presence.game) 
-            embed.addField('В игре', stripIndents`**> Название:** ${member.user.presence.game.name}`);
 
         return message.channel.send(embed);
     }

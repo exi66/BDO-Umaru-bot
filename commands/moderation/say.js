@@ -4,16 +4,16 @@ module.exports = {
     name: "say",
 	category: "moderation",
     aliases: ["bc", "broadcast"],
-    description: "Бот говорит за вас",
+    description: (lang) => { return lang.cmd.DESCRIPTION },
     usage: "[embed] <message>",
-    run: (client, message, args) => {
+    run: (client, message, args, lang) => {
         if (!message.member.hasPermission("MANAGE_MESSAGES"))
-            return message.reply("у вас нет прав использовать эту команду.").then(m => m.delete({ timeout: 10000 }));
+            return message.reply(lang.global.DONT_HAVE_PERMISSIONS);
         
         message.delete();
 
         if (args.length <= 0)
-            return message.reply("нечего сказать?").then(m => m.delete({ timeout: 10000 }));
+            return message.reply(lang.global.DONT_HAVE_ARGS);
 
         const roleColor = message.guild.me.displayColor;
 
