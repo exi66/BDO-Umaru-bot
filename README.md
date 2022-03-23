@@ -12,7 +12,7 @@
 ## Setting on the discord server
   The bot does not have a whitelist on the server, so if you want to use it for personal purposes on a public server, be sure to implement this check. This can be done in the `ready` and `guildCreate` methods.
 ### BDO
-  Edit language with command '!config edit lang `[ru | en]`.  
+  Edit language with command `!config edit lang [ru | en]`.  
   The most basic functionality is available immediately with the `!start` command.   
   To add your own items to track, use the `!track [add | remove]`. You can find item IDs at the [code](https://bdocodex.com/en/).
   She can also see all tracked items groups `!track`.  
