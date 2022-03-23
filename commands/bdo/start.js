@@ -135,8 +135,8 @@ module.exports = {
 			return message.channel.send(lang.global.TIMEOUT);
 		});
 		all_messages.push(region_message.first()); 
-		if (client.umaru.regions.includes(region_message.content.toLowerCase())) {
-			var local_region = region_message.content.toLowerCase();
+		if (client.umaru.regions.includes(region_message.first().content.toLowerCase())) {
+			var local_region = region_message.first().content.toLowerCase();
 			await message.channel.send(lang.cmd.CREATE_AUTO(client.umaru.prefix)).then(m => all_messages.push(m));
 			let m = await message.channel.awaitMessages(filter, {
 				max: 1,
