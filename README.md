@@ -1,32 +1,35 @@
 # bdo-umaru-bot
 ## Discord.js bot for scraping black desert market queue and coupons
-  Сurrently dev and support only russian region
+  Сurrently cupons scraping support only russian region
 
-## Запуск
-  Для запуска необходимо создать `config.json` аналогично `config-example.json`, указать в нем токен, префикс и опционально изменить место хранения данных.
+## Run
+  To run, you need to create `config.json` similarly to `config-example.json`, specify the token, prefix in it, and optionally change the data storage location.
 
-## Используемые для скрапинга данных ресурсы
-  Все действующие купоны берутся с сайта [Орбиты-Игр](https://orbit-games.com/)  
-  Очередь аукциона берется с [Velia Inn](https://veliainn.com/)  
+## Resources used for data scraping
+  All valid coupons are taken from the [Orbit-пames](https://orbit-games.com/) (ITS ONLY FOR RU REGION)  
+  The market queue is taken from [Velia Inn](https://veliainn.com/)  
 
-## Настройка на сервере
-  У бота отсутвует вайтлист на сервера, так что если решите использовать в личных целях на публичном сервере, обязательно реализуйте эту проверку. Это можно сделать в методах `ready` и `guildCreate`.  
+## Setting on the discord server
+  The bot does not have a whitelist on the server, so if you want to use it for personal purposes on a public server, be sure to implement this check. This can be done in the `ready` and `guildCreate` methods.
 ### BDO
-  Самый базовый функционал доступен сразу по команде `!start`. Создается категория и два канала в ней, в которые постятся купоны и регистрируемые на аукционе V БС, V бижутерия Маноса и Деборики с упоминанием созданных ролей. 
-  Чтобы добавить свои предметы для отслеживания используется команда `!track [add  | remove]`. Узнать айди предметов можно на [кодексе](https://bdocodex.com/ru/).
-  Ей же можно посмотреть все отслеживаемые группы товаров `!track`.  
-  Если необходимо точечно что-то изменить в конфиге, можно использовать команду `!config edit <key> <new value>`, где ключом может быть:  
-  - `category` - id категории каналов бота  
-  - `queue` - id канала очереди аукциона  
-  - `coupons` - id канала с купонами  
-  - `coupons_role` - id роли, которая упоминается при публикации купонов
-  - `premium` - флаг true или false, который отвечает за возможность отлеживания больше 5 групп товаров на сервере. 
-Этот параметр может менять только root-пользователь, id которого указывается в `config.json`  
+  Edit language with command '!config edit lang `[ru | en]`.  
+  The most basic functionality is available immediately with the `!start` command.   
+  To add your own items to track, use the `!track [add | remove]`. You can find item IDs at the [code](https://bdocodex.com/en/).
+  She can also see all tracked items groups `!track`.  
+  If you need to change something pointwise in the config, you can use the `!config edit <key> <new value>` command, where the key can be:
+  - `lang` - bot lang
+  - `region` - game region
+  - `category` - bot channel category id
+  - `queue` - id of the market queue channel
+  - `coupons` - id of the channel with coupons
+  - `coupons_role` - id of the role that is mentioned when publishing coupons
+  - `premium` - flag true or false, which is responsible for the possibility of tracking more than 5 product groups on the server.
+This parameter can only be changed by the root user, whose id is specified in `config.json`
 
-Этой же командой можно посмотреть сокращенный конфиг текущего сервера `!config` или весь `!config json`.
-### Вспомогательные команды
-`!help [cmd name or alias]` выводит все команды при отсутствии аргументов и краткую информацию по использованию команды в случае указания ее имени в аргументе  
-`!exec <cmd>` выполняет следующий после команды код. Команда доступна только root-пользователю  
-`!umaru [reques]` постит рандомную гифку по запросу  
+With the same command, you can view the shortened config of the current server `!config` or the entire `!config json`.
+### Auxiliary commands
+`!help [cmd name or alias]` prints all commands if there are no arguments and brief information about using the command if its name is specified in the argument
+`!exec <cmd>` executes the code following the command. The command is available only to the root user
+`!umaru [reques]` post a random GIF on request
   
   
