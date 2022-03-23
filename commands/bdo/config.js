@@ -25,7 +25,7 @@ module.exports = {
                 embed: {
                     color: "#2f3136",
                     title: lang.cmd.EMBED.TITLE,
-                    description: `guild: \`${message.guild.id}\`\nlang: \`${local_config.lang}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons_role: \`${local_config.coupons_role || " "}\``
+                    description: `guild: \`${message.guild.id}\`\nlang: \`${local_config.lang}\`\nregion: \`${local_config.region}\`\npremium: \`${local_config.premium}\`\ncategory: \`${local_config.category || " "}\`\nqueue: \`${local_config.queue || " "}\`\ncoupons: \`${local_config.coupons || " "}\`\ncoupons_role: \`${local_config.coupons_role || " "}\``
                 }
             });
         }
@@ -51,7 +51,11 @@ module.exports = {
                 case "lang":
                     let langs = Array.from(client.languages.keys());
                     local_config.lang = langs.includes(args[2]) ? args[2] : config.default_lang;
-                    break;      
+                    break;
+                case "region":
+                    let regions = client.umaru.regions;
+                    local_config.region = regions.includes(args[2]) ? args[2] : config.default_region;
+                    break;                            
                 default:
                     return message.channel.send(lang.cmd.EDIT_AND_SAVE);
             }

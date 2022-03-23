@@ -46,7 +46,7 @@ module.exports = {
         },
         QUEUE : {
             DESCRIPTION: "Returns the current market registration queue",
-            DONT_HAVE_ITEMS: "The market queue is empty!",
+            DONT_HAVE_ITEMS: "The market queue is empty or untracked!",
             EMBED: {
                 TITLE: "Market queue",
                 FIELDS: {
@@ -73,6 +73,7 @@ module.exports = {
             CATEGORY_NAME: "bdo umaru",
             COUPONS_CHANNEL_NAME: "coupons",
             QUEUE_CHANNEL_NAME: "queue",
+            SELECT_REGION: (regions) => { return `Select game region:\n${regions}`},
             CREATE_AUTO: (prefix) => { return `Automatic setup will create a category, two channels in it, and basic roles for tracking coupons and rare items. In case of refusal, a config template will be created without any parameters, which can be configured with the \`${prefix}config\` command. Do you want to auto setup? (Yes/No)` },
             SUCCESS: (prefix) => { return `Server configuration successfully created! To edit market tracked items use \`${prefix}track\` command, to change server configuration \`${prefix}config\`` },
             CREATE_AUTO_COUPONS: "Create a channel and role to track coupons? This function is only available for the RU region. If not, the step will be skipped. (Yes/No)",

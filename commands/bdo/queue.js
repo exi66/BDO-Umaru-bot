@@ -8,10 +8,12 @@ module.exports = {
     name: "queue",
 	category: "bdo",
     aliases: ["q", "que"],
+	usage: "[ region ]",
     description: (lang) => { return lang.cmd.DESCRIPTION },
     run: (client, message, args, lang) => {
 		try {
-			var queue_list = client.getQueue();
+			var region = client.umaru.regions.includes(args[0]) ? args[0] : message.guild.umaru.region;
+			var queue_list = client.getQueue(region) || {};
 			let items = queue_list.items || [];
 			if (items.length > 0) {
 				let names = items.map(e => e[4]).join("\n"), 

@@ -64,9 +64,6 @@ async function createListers(client) {
         if (!message.guild) return;
         let flag = message.content.startsWith(client.umaru.prefix);
         if (flag || message.mentions.has(client.user.id)) {
-            let c = client.getConfig(message.guild);
-            c.lang = "en";
-            client.saveConfigs();
             const args = (flag ? message.content.slice(client.umaru.prefix.length) : message.content.replace(/<@.?[0-9]*?>/g, "")).trim().split(/ +/g);
             const cmd = args.shift().toLowerCase();
             if (cmd.length === 0) return;
@@ -98,6 +95,7 @@ module.exports = (config) => {
         let local_config = {
             guild:          guild.id,
             lang:           guild.umaru.lang || client.umaru.default_lang,
+            region:         guild.umaru.region || client.umaru.default_region,
             premium:        guild.umaru.premium || false,
             category:       guild.umaru.category ? guild.umaru.category.id : null,
             queue:          guild.umaru.queue ? guild.umaru.queue.id : null,
@@ -120,6 +118,7 @@ module.exports = (config) => {
     client.setConfig = (guild, local_config) => {
         guild.umaru                 = {};
         guild.umaru.lang            = local_config.lang || client.umaru.default_lang;
+        guild.umaru.region          = local_config.region || client.umaru.default_region;
         guild.umaru.premium         = local_config.premium || false;
         guild.umaru.category        = guild.channels.cache.find(c => c.id === local_config.category && c.type === "category") || null;
         guild.umaru.queue           = guild.channels.cache.get(local_config.queue) || null;
@@ -149,18 +148,27 @@ module.exports = (config) => {
         });
         return true;
     }; 
-    client.getQueue = () => {
+    client.getQueue = (region) => {
         let queue_list = [];
         try {
             queue_list = JSON.parse(fs.readFileSync(client.umaru.queue_folder, "utf8"));
         } catch (e) {
             printError(error_here, e.message);
         }
-        return queue_list;       
+        return queue_list.find(e => e.region === region);
     };
     client.setQueue = (array) => {
-        fs.writeFile(client.umaru.queue_folder, JSON.stringify(array, null, 4), function(e) {
-            if (e) return printError(error_here, "cannot save all coupones, "+err.message);
+        let queue_list = [];
+        try {
+            queue_list = JSON.parse(fs.readFileSync(client.umaru.queue_folder, "utf8"));
+        } catch (e) {
+            printError(error_here, e.message);
+        }
+        let elem = queue_list.find(e => e.region === array.region);  
+        if (elem) elem = array;
+        else queue_list.push(array);          
+        fs.writeFile(client.umaru.queue_folder, JSON.stringify(queue_list, null, 4), function(e) {
+            if (e) return printError(error_here, "cannot save all coupones, "+e.message);
         });
         return true;
     }; 

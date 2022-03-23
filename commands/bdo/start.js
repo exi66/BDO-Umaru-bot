@@ -4,7 +4,7 @@ const where = __filename.slice(__dirname.length + 1);
 const error_here = where+"/error";
 const log_here = where+"/log";
 
-async function createConfigAuto(message, lang, flag) {
+async function createConfigAuto(message, lang, flag, region) {
 
 	const template = lang.cmd.TEMPLATE;
 			
@@ -99,6 +99,7 @@ async function createConfigAuto(message, lang, flag) {
 	var queue		 			= await message.guild.channels.create(lang.cmd.QUEUE_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
 	
 	local_config.lang 			= lang.name;
+	local_config.region 		= region;
 	local_config.guild 			= message.guild.id;
 	local_config.queue			= queue.id;
 	if (flag)
@@ -125,17 +126,18 @@ module.exports = {
 		}
 		var all_messages = [];
 		var filter = m => m.author.id === message.author.id;
-		await message.channel.send(lang.cmd.CREATE_AUTO(client.umaru.prefix)).then(m => all_messages.push(m));
-		let m = await message.channel.awaitMessages(filter, {
+		await message.channel.send(lang.cmd.SELECT_REGION(client.umaru.regions.map(e => "• "+e.toUpperCase()).join("\n"))).then(m => all_messages.push(m));
+		let region_message = await message.channel.awaitMessages(filter, {
 			max: 1,
 			time: 240000,
 			errors: ["time"]
 		}).catch(() => {
 			return message.channel.send(lang.global.TIMEOUT);
 		});
-		all_messages.push(m.first()); 
-		if (m.first().content.toLowerCase() === "y" || m.first().content.toLowerCase() === "yes" || m.first().content.toLowerCase() === "да") {
-			await message.channel.send(lang.cmd.CREATE_AUTO_COUPONS).then(m => all_messages.push(m));
+		all_messages.push(region_message.first()); 
+		if (client.umaru.regions.includes(region_message.content.toLowerCase())) {
+			var local_region = region_message.content.toLowerCase();
+			await message.channel.send(lang.cmd.CREATE_AUTO(client.umaru.prefix)).then(m => all_messages.push(m));
 			let m = await message.channel.awaitMessages(filter, {
 				max: 1,
 				time: 240000,
@@ -143,17 +145,36 @@ module.exports = {
 			}).catch(() => {
 				return message.channel.send(lang.global.TIMEOUT);
 			});
+			all_messages.push(m.first()); 
 			if (m.first().content.toLowerCase() === "y" || m.first().content.toLowerCase() === "yes" || m.first().content.toLowerCase() === "да") {
-				let local_config = await createConfigAuto(message, lang, true);
-				client.setConfig(message.guild, local_config);
+				await message.channel.send(lang.cmd.CREATE_AUTO_COUPONS).then(m => all_messages.push(m));
+				let m = await message.channel.awaitMessages(filter, {
+					max: 1,
+					time: 240000,
+					errors: ["time"]
+				}).catch(() => {
+					return message.channel.send(lang.global.TIMEOUT);
+				});
+				all_messages.push(m.first()); 
+				if (m.first().content.toLowerCase() === "y" || m.first().content.toLowerCase() === "yes" || m.first().content.toLowerCase() === "да") {
+					let local_config = await createConfigAuto(message, lang, true);
+					client.setConfig(message.guild, local_config);
+				} else if (m.first().content.toLowerCase() === "n" || m.first().content.toLowerCase() === "no" || m.first().content.toLowerCase() === "нет") {
+					let local_config = await createConfigAuto(message, lang, false, local_region);
+					client.setConfig(message.guild, local_config);	
+				} else {
+					all_messages.forEach(e => e.delete({ timeout: 10000 }));
+					return message.channel.send(lang.global.CANCEL);
+				}	
 			} else if (m.first().content.toLowerCase() === "n" || m.first().content.toLowerCase() === "no" || m.first().content.toLowerCase() === "нет") {
-				let local_config = await createConfigAuto(message, lang, false);
-				client.setConfig(message.guild, local_config);	
-			} else return message.channel.send(lang.global.CANCEL);	
-		} else if (m.first().content.toLowerCase() === "n" || m.first().content.toLowerCase() === "no" || m.first().content.toLowerCase() === "нет") {
-			client.setConfig(message.guild, {});
+				client.setConfig(message.guild, { region: local_region, lang: lang.name });
+			} else {
+				all_messages.forEach(e => e.delete({ timeout: 10000 }));
+				return message.channel.send(lang.global.CANCEL);			
+			}
 		} else {
-		 	return message.channel.send(lang.global.CANCEL);			
+			all_messages.forEach(e => e.delete({ timeout: 10000 }));
+			return message.channel.send(lang.global.CANCEL);			
 		}
 		all_messages.forEach(e => e.delete({ timeout: 10000 }));
 		return message.channel.send(lang.cmd.SUCCESS(client.umaru.prefix));
