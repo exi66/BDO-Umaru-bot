@@ -8,7 +8,7 @@ module.exports = {
             TIMEOUT: "Команда отменена по таймауту!",
             ERROR: "Непредвиденная ошибка!",
             DONT_HAVE_PERMISSIONS: "у вас нет прав использовать эту команду!",
-            DONT_HAVE_ARGS: "отсутвуют аргументы!",
+            DONT_HAVE_ARGS: "отсутствуют аргументы!",
         },
         BOT: {
             ACTIVITY: (guilds, prefix) => { return `${guilds} ${declOfNum(guilds, ["сервер", "сервера", "серверов"])} • ${prefix}help` },
@@ -32,11 +32,11 @@ module.exports = {
         },
         CONFIG : {
             DESCRIPTION: "Управляет конфигурацией сервера",
-            DONT_HAVE_CONFIG: "конфигурация сервера отсутствует, использование не возможно!",
+            DONT_HAVE_CONFIG: "конфигурация сервера отсутствует, использование невозможно!",
             EMBED: {
                 TITLE: "Конфигурация сервера",
             },
-            INCORRECT_CONFIG_ARGS: "Неизвестный параметр! Изменять можно только `category`, `queue`, `coupons`, `coupons_role`, `lang`",
+            INCORRECT_CONFIG_ARGS: "Неизвестный параметр! Изменить можно только `category`, `queue`, `coupons`, `coupons_role`, `lang`",
             EDIT_AND_SAVE: "Изменено и сохранено!",
         },
         COUPONES : {
@@ -77,11 +77,12 @@ module.exports = {
             QUEUE_CHANNEL_NAME: "queue",
             CREATE_AUTO: (prefix) => { return `Автоматическая настройка создаст категорию, два канала в ней и базовые роли для отслеживания купонов и редких предметов. В случае отказа будет создан шаблон конфига без каких-либо параметров, который можно настроить командой \`${prefix}config\`. Хотите ли вы произвести автоматическую настройку? (Да/Нет)` },
             SUCCESS: (prefix) => { return `Конфигурация сервера успешно создана! Для редактирования отслеживаемых товаров аукциона используйте команду \`${prefix}track\`, для изменения конфигурации сервера \`${prefix}config\`` },
+            CREATE_AUTO_COUPONS: "Создать канал и роль для отслеживания купонов? Эта функция доступна только для RU региона. В случае отказа шаг будет пропущен. (Да/Нет)",
         },
         TRACK : {
             DESCRIPTION: "Управляет отслеживанием аукциона",
             TRACKED_EMPTY: "Cписок отслеживаемых товаров пуст!",
-            DONT_HAVE_CONFIG: "конфигурация сервера отсутствует, использование не возможно!",
+            DONT_HAVE_CONFIG: "конфигурация сервера отсутствует, использование невозможно!",
             EMBED: {
                 TITLE: "Отслеживаемые товары",
                 FIELDS: {
@@ -123,7 +124,7 @@ module.exports = {
         ABOUT : {
             EMBED: {
                 TITLE: "О проекте",
-                DESCRIPTION: "Простой бот на Discord.js с фукнциями для проекта [BDO](https://www.ru.playblackdesert.com/main/index)\n[Github](https://github.com/exi66/BDO-Umaru-bot)\n[Telegram](https://t.me/exi666)\nDiscord: `Exi#5604`",    
+                DESCRIPTION: "Простой бот на Discord.js с функциями для игры [BDO](https://www.ru.playblackdesert.com/main/index)\n[Github](https://github.com/exi66/BDO-Umaru-bot)\n[Telegram](https://t.me/exi666)\nDiscord: `Exi#5604`",    
             },
         },
         GUILD : {

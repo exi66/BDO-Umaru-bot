@@ -37,8 +37,9 @@ module.exports = (client) => {
                                 let coupons_configurations_list = configurations_list.filter(g => g.umaru.coupons);
                                 for (let local_guild of coupons_configurations_list) {						
                                     try {
+                                        const local_channel = client.channels.cache.get(local_guild.umaru.coupons.id);
                                         const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
-                                        if (local_guild.umaru.coupons) local_guild.umaru.coupons.send({
+                                        if (local_channel) local_channel.send({
                                             content: `<@&${local_guild.coupons_role}>`,
                                             embed: {
                                                 color: "#2f3136",
@@ -90,8 +91,9 @@ module.exports = (client) => {
                                     }
                                     if (important_items_list.length > 0) {						
                                         try {
+                                            const local_channel = client.channels.cache.get(local_guild.umaru.queue.id);
                                             const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
-                                            if (local_guild.umaru.queue) local_guild.umaru.queue.send({
+                                            if (local_channel) local_channel.send({
                                                 content: mentions,
                                                 embed: {
                                                     color: "#2f3136",

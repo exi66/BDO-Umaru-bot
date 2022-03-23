@@ -4,7 +4,7 @@ const where = __filename.slice(__dirname.length + 1);
 const error_here = where+"/error";
 const log_here = where+"/log";
 
-async function createConfigAuto(message, lang) {
+async function createConfigAuto(message, lang, flag) {
 
 	const template = lang.cmd.TEMPLATE;
 			
@@ -87,20 +87,25 @@ async function createConfigAuto(message, lang) {
 
 	var local_config 			= TEMPLATE.CONFIG;
 
-	var coupons_role		 	= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.COUPONS);
+	if (flag)
+		var coupons_role		= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.COUPONS);
 	var v_bs_role			 	= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_BS);
 	var v_manos_role 			= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_MANOS);
 	var iv_deborika_role 		= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.IV_DEBORIKA);
 	var v_deborika_role 		= await message.guild.roles.create(TEMPLATE.DISCORD_ROLES.V_DEBORIKA);
 	var cat						= await message.guild.channels.create(lang.cmd.CATEGORY_NAME, { type: "category", permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
-	var coupons					= await message.guild.channels.create(lang.cmd.COUPONS_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
+	if (flag)
+		var coupons				= await message.guild.channels.create(lang.cmd.COUPONS_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
 	var queue		 			= await message.guild.channels.create(lang.cmd.QUEUE_CHANNEL_NAME, { type: "text", parent: cat, permissionOverwrites: [{ id: message.guild.id, allow: ["VIEW_CHANNEL"], }] });
 	
+	local_config.lang 			= lang.name;
 	local_config.guild 			= message.guild.id;
 	local_config.queue			= queue.id;
-	local_config.coupons 		= coupons.id;
+	if (flag)
+		local_config.coupons 	= coupons.id;
 	local_config.category 		= cat.id;
-	local_config.coupons_role 	= coupons_role.id;
+	if (flag)
+		local_config.coupons_role = coupons_role.id;
 	local_config.items[0].role 	= v_bs_role.id;
 	local_config.items[1].role 	= v_manos_role.id;
 	local_config.items[2].role 	= iv_deborika_role.id;
@@ -130,8 +135,21 @@ module.exports = {
 		});
 		all_messages.push(m.first()); 
 		if (m.first().content.toLowerCase() === "y" || m.first().content.toLowerCase() === "yes" || m.first().content.toLowerCase() === "да") {
-			let local_config = await createConfigAuto(message, lang);
-			client.setConfig(message.guild, local_config);
+			await message.channel.send(lang.cmd.CREATE_AUTO_COUPONS).then(m => all_messages.push(m));
+			let m = await message.channel.awaitMessages(filter, {
+				max: 1,
+				time: 240000,
+				errors: ["time"]
+			}).catch(() => {
+				return message.channel.send(lang.global.TIMEOUT);
+			});
+			if (m.first().content.toLowerCase() === "y" || m.first().content.toLowerCase() === "yes" || m.first().content.toLowerCase() === "да") {
+				let local_config = await createConfigAuto(message, lang, true);
+				client.setConfig(message.guild, local_config);
+			} else if (m.first().content.toLowerCase() === "n" || m.first().content.toLowerCase() === "no" || m.first().content.toLowerCase() === "нет") {
+				let local_config = await createConfigAuto(message, lang, false);
+				client.setConfig(message.guild, local_config);	
+			} else return message.channel.send(lang.global.CANCEL);	
 		} else if (m.first().content.toLowerCase() === "n" || m.first().content.toLowerCase() === "no" || m.first().content.toLowerCase() === "нет") {
 			client.setConfig(message.guild, {});
 		} else {
