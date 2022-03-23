@@ -6,7 +6,7 @@
   To run, you need to create `config.json` similarly to `config-example.json`, specify the token, prefix in it, and optionally change the data storage location.
 
 ## Resources used for data scraping
-  All valid coupons are taken from the [Orbit-пames](https://orbit-games.com/) (ITS ONLY FOR RU REGION)  
+  All valid coupons are taken from the [Orbit-games](https://orbit-games.com/) (ITS ONLY FOR RU REGION)  
   The market queue is taken from [Velia Inn](https://veliainn.com/)  
 
 ## Setting on the discord server
