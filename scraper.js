@@ -78,7 +78,7 @@ module.exports = (client) => {
                                 let items = data.items;
                                 //let lastupdate = data["lastUpdate"];
                                 if (items.length > 0) {
-                                    let queue_configurations_list = configurations_list.filter(g => g.umaru.queue);
+                                    let queue_configurations_list = configurations_list.filter(g => g.umaru.queue && g.umaru.region === reg);
                                     for (let local_guild of queue_configurations_list) {
                                         let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
                                         for (let local_items of local_guild.umaru.items) {
