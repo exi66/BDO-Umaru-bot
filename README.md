@@ -23,7 +23,7 @@
   - `queue` - id of the market queue channel
   - `coupons` - id of the channel with coupons
   - `coupons_role` - id of the role that is mentioned when publishing coupons
-  - `premium` - flag true or false, which is responsible for the possibility of tracking more than 5 product groups on the server.
+  - `premium` - flag true or false, which is responsible for the possibility of tracking more than 5 items groups on the server.
 This parameter can only be changed by the root user, whose id is specified in `config.json`
 
 With the same command, you can view the shortened config of the current server `!config` or the entire `!config json`.
