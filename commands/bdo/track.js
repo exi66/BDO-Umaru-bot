@@ -106,8 +106,8 @@ async function removeTracked(client, message, lang) {
 function addTracked(client, message, lang) {
     const add = lang.cmd.ADD;
     var local_config = client.getConfig(message.guild);
-    if ((local_config.items.length >= 5) && !local_config.premium) {
-        return message.channel.send(add.LIMITE_ERROR);
+    if ((local_config.items.length >= client.umaru.max_groups) && !local_config.premium) {
+        return message.channel.send(add.LIMITE_ERROR(client.umaru.max_groups));
     }
     var new_item = {
         role: "",
@@ -135,6 +135,7 @@ function addTracked(client, message, lang) {
             },
             after: (msg) => {
                 let local_id = msg.content.replace(/\D/gm, " ").replace(/\s\s+/g, " ").split(" ");
+                if (local_id.length > client.umaru.max_items && !local_config.premium) return { error: add.ERROR_2(client.umaru.max_items) };
                 return new_item.ids = local_id.map(e => parseInt(e));
             }
         },
