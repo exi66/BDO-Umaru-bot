@@ -10,5 +10,13 @@
     "queue": true,
     "default_lang": "ru",
     "default_region": "ru",
-    "regions": ["ru", "eu", "na", "kr", "sea", "sa", "jp", "th", "tw"]
+    "regions": [
+        {
+            "name": "ru",
+            "url": "https://trade.ru.playblackdesert.com/",
+            "cookie": ""
+        }
+    ],
+    "max_items": 23,
+    "max_groups": 5
 }

@@ -62,65 +62,80 @@ module.exports = (client) => {
                     client.guilds.cache.forEach((g) => {
                         if (g.umaru) guilds_regions.push(g.umaru.region);
                     });
-                    var intersection = client.umaru.regions.filter(e => guilds_regions.includes(e));
+                    var intersection = client.umaru.regions.map(e => e.name).filter(e => guilds_regions.includes(e));
                     for (let reg of intersection) {
-                        request({
-                            method: "GET",
-                            url: encodeURI(`http://veliainn.com/api/market-queue/${reg}`),
-                            headers: {
-                                "User-Agent": "BDO-Umaru-bot https://github.com/exi66/BDO-Umaru-bot"
-                            }
-                        }).then(body => {
-                            if (body !== "" && body != null) {
-                                let data = JSON.parse(body);
-                                data.region = reg;
-                                client.setQueue(data);
-                                let items = data.items;
-                                //let lastupdate = data["lastUpdate"];
-                                if (items.length > 0) {
-                                    let queue_configurations_list = configurations_list.filter(g => g.umaru.queue && g.umaru.region === reg);
-                                    for (let local_guild of queue_configurations_list) {
-                                        let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
-                                        for (let local_items of local_guild.umaru.items) {
-                                            for (let item of items) {		
-                                                if(local_items.ids.includes(parseInt(item[0])) && item[1] == local_items.enchant) {
-                                                    important_items_list.push(item);
-                                                    if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
-                                                    lvls += item[1]+"\n";
-                                                    names += item[4]+"\n";
-                                                    let date = new Date(item[3] * 1000);
-                                                    let hours = date.getHours();
-                                                    let minutes = "0" + date.getMinutes();
-                                                    let seconds = "0" + date.getSeconds();
-                                                    times += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
-                                                }										
-                                            }
-                                        }
-                                        if (important_items_list.length > 0) {						
-                                            try {
-                                                const local_channel = client.channels.cache.get(local_guild.umaru.queue.id);
-                                                const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
-                                                if (local_channel) local_channel.send({
-                                                    content: mentions,
-                                                    embed: {
-                                                        color: "#2f3136",
-                                                        title: lang.cmd.QUEUE.EMBED.TITLE,
-                                                        timestamp: new Date(),
-                                                        fields: [
-                                                            { name: lang.cmd.QUEUE.EMBED.FIELDS.LVL, value: lvls, inline: true},
-                                                            { name: lang.cmd.QUEUE.EMBED.FIELDS.NAME, value: names, inline: true},
-                                                            { name: lang.cmd.QUEUE.EMBED.FIELDS.TIME, value: times, inline: true}
-                                                        ]
-                                                    }
-                                                });
-                                            } catch (e) {
-                                                printError(error_here, "cannot send queue, "+e.message);
-                                            }									
-                                        }
-                                    }							
+                        let local_reg = client.umaru.regions.find(e => e.name === reg);
+                        if (local_reg) {
+                            request({
+                                method: "POST",
+                                url: local_reg.url+"Home/GetWorldMarketWaitList",
+                                headers: {
+									"content-type": "application/json",
+                                    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                                    "cookie": local_reg.cookie,
+                                    "referer": local_reg.url,
+                                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36"
                                 }
-                            }
-                        }).catch(function(e) { printError(error_here, "queue request error, "+e.message) });
+                            }).then(body => {
+                                if (body !== "" && body != null) {
+                                    let data = JSON.parse(body)._waitList || [];
+                                    let items = [];
+                                    if (data.length > 0) {
+                                        for (let d of data) {
+                                            let item = [d.mainKey, d.chooseKey, d._pricePerOne, d._waitEndTime, d.name];
+                                            items.push(item);
+                                        }
+                                    }
+                                    client.setQueue({
+                                        region: reg,
+                                        lastUpdate: new Date(),
+                                        items: items,
+                                    });
+                                    if (items.length > 0) {
+                                        let queue_configurations_list = configurations_list.filter(g => g.umaru.queue && g.umaru.region === reg);
+                                        for (let local_guild of queue_configurations_list) {
+                                            let important_items_list = [], mentions = "", names = "", lvls = "", times = "";								
+                                            for (let local_items of local_guild.umaru.items) {
+                                                for (let item of items) {		
+                                                    if(local_items.ids.includes(parseInt(item[0])) && item[1] == local_items.enchant) {
+                                                        important_items_list.push(item);
+                                                        if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
+                                                        lvls += item[1]+"\n";
+                                                        names += item[4]+"\n";
+                                                        let date = new Date(item[3]);
+                                                        let hours = date.getHours();
+                                                        let minutes = "0" + date.getMinutes();
+                                                        let seconds = "0" + date.getSeconds();
+                                                        times += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
+                                                    }										
+                                                }
+                                            }
+                                            if (important_items_list.length > 0) {						
+                                                try {
+                                                    const local_channel = client.channels.cache.get(local_guild.umaru.queue.id);
+                                                    const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
+                                                    if (local_channel) local_channel.send({
+                                                        content: mentions,
+                                                        embed: {
+                                                            color: "#2f3136",
+                                                            title: lang.cmd.QUEUE.EMBED.TITLE,
+                                                            timestamp: new Date(),
+                                                            fields: [
+                                                                { name: lang.cmd.QUEUE.EMBED.FIELDS.LVL, value: lvls, inline: true},
+                                                                { name: lang.cmd.QUEUE.EMBED.FIELDS.NAME, value: names, inline: true},
+                                                                { name: lang.cmd.QUEUE.EMBED.FIELDS.TIME, value: times, inline: true}
+                                                            ]
+                                                        }
+                                                    });
+                                                } catch (e) {
+                                                    printError(error_here, "cannot send queue, "+e.message);
+                                                }									
+                                            }
+                                        }							
+                                    }
+                                }
+                            }).catch(function(e) { printError(error_here, "queue request error, "+e.message) });
+                        }
                     }
                 }
             }

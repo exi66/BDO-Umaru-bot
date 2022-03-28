@@ -3,11 +3,10 @@
   Сurrently cupons scraping support only russian region
 
 ## Run
-  To run, you need to create `config.json` similarly to `config-example.json`, specify the token, prefix in it, and optionally change the data storage location.
+  To run, you need to create `config.json` similarly to `config-example.json`, specify the token, prefix in it, and market api cookie and url.
 
 ## Resources used for data scraping
   All valid coupons are taken from the [Orbit-games](https://orbit-games.com/) (ITS ONLY FOR RU REGION)  
-  The market queue is taken from [Velia Inn](https://veliainn.com/)  
 
 ## Setting on the discord server
   The bot does not have a whitelist on the server, so if you want to use it for personal purposes on a public server, be sure to implement this check. This can be done in the `ready` and `guildCreate` methods.

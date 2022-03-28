@@ -107,10 +107,11 @@ module.exports = {
                 SUCCESS: "Deleted and saved!",
             },
             ADD: {
-                LIMITE_ERROR: "The limit of 5 monitored items groups for the non premium server has been reached! Delete a group to create a new one.",
+                LIMITE_ERROR: (count) => { return `The limit of ${count} monitored items groups for the non premium server has been reached! Delete a group to create a new one.` },
                 QUESTION_1: "Which role to mention? Specify `id` or mention it via `@role-name`",
                 ERROR_1: "Failed to recognize role!",
                 QUESTION_2: "List the id of items needed to track",
+                ERROR_2: (count) => { return `There can be no more than ${count} items in one group!` },
                 QUESTION_3: "Specify the level of enhancement (common for the entire group of previously specified items)",
                 ERROR_3: "Failed to recognize the number!",
                 QUESTION_4: "All right? Yes(Y)\/No(N)",
