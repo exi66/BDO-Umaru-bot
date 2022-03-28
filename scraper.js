@@ -33,14 +33,14 @@ module.exports = (client) => {
                             }							
                             if (new_coupones_list.length > 0) {
                                 client.setCoupons(all_coupones_list);
-                                let codes = coupons_list.map(e => "`" + e + "`").join("\n");
+                                let codes = new_coupones_list.map(e => "`" + e + "`").join("\n");
                                 let coupons_configurations_list = configurations_list.filter(g => g.umaru.coupons);
                                 for (let local_guild of coupons_configurations_list) {						
                                     try {
                                         const local_channel = client.channels.cache.get(local_guild.umaru.coupons.id);
                                         const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
                                         if (local_channel) local_channel.send({
-                                            content: `<@&${local_guild.umaru.coupons_role}>`,
+                                            content: `<@&${local_guild.umaru.coupons_role.id}>`,
                                             embed: {
                                                 color: "#2f3136",
                                                 title: lang.cmd.COUPONES.EMBED.TITLE,
