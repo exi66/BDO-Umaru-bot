@@ -40,7 +40,7 @@ module.exports = (client) => {
                                         const local_channel = client.channels.cache.get(local_guild.umaru.coupons.id);
                                         const lang = { cmd: client.languages.get(local_guild.umaru.lang || client.umaru.default_lang)["SCRAPER"] };
                                         if (local_channel) local_channel.send({
-                                            content: `<@&${local_guild.coupons_role}>`,
+                                            content: `<@&${local_guild.umaru.coupons_role}>`,
                                             embed: {
                                                 color: "#2f3136",
                                                 title: lang.cmd.COUPONES.EMBED.TITLE,
