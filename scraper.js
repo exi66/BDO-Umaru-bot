@@ -78,12 +78,11 @@ module.exports = (client) => {
                                 }
                             }).then(body => {
                                 if (body !== "" && body != null) {
-                                    let data = JSON.parse(body);
-                                    let res = data._waitList || [];
+                                    let data = JSON.parse(body)._waitList || [];
                                     let items = [];
-                                    if (res.length > 0) {
-                                        for (let re of res) {
-                                            let item = [re.mainKey, re.chooseKey, re._pricePerOne, re._waitEndTime, re.name];
+                                    if (data.length > 0) {
+                                        for (let d of data) {
+                                            let item = [d.mainKey, d.chooseKey, d._pricePerOne, d._waitEndTime, d.name];
                                             items.push(item);
                                         }
                                     }
