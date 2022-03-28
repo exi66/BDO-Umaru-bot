@@ -18,7 +18,7 @@ module.exports = {
 			if (items.length > 0) {
 				let names = items.map(e => e[4]).join("\n"), 
 				lvls = items.map(e => e[1]).join("\n"), 
-				times = items.map(e => `${new Date(e[3] * 1000).getHours()}:${("0" + new Date(e[3]  * 1000).getMinutes()).substr(-2)}:${("0" + new Date(e[3] * 1000).getSeconds()).substr(-2)}`).join("\n");						
+				times = items.map(e => new Date(e[3]).getHours() + ":" + ("0" + new Date(e[3]).getMinutes()).slice(-2) + ":" + ("0" + new Date(e[3]).getSeconds()).slice(-2)).join("\n");						
 				try {
 					message.channel.send({
 						embed: {

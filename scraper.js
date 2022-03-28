@@ -70,6 +70,7 @@ module.exports = (client) => {
                                 method: "POST",
                                 url: local_reg.url+"Home/GetWorldMarketWaitList",
                                 headers: {
+									"content-type": "application/json",
                                     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                                     "cookie": local_reg.cookie,
                                     "referer": local_reg.url,
@@ -78,11 +79,11 @@ module.exports = (client) => {
                             }).then(body => {
                                 if (body !== "" && body != null) {
                                     let data = JSON.parse(body);
-                                    let res = data.resultMsg ? data.resultMsg.split("|") : [];
+                                    let res = data._waitList || [];
                                     let items = [];
                                     if (res.length > 0) {
                                         for (let re of res) {
-                                            let item = re.split("-");
+                                            let item = [re.mainKey, re.chooseKey, re._pricePerOne, re._waitEndTime, re.name];
                                             items.push(item);
                                         }
                                     }
@@ -102,7 +103,7 @@ module.exports = (client) => {
                                                         if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
                                                         lvls += item[1]+"\n";
                                                         names += item[4]+"\n";
-                                                        let date = new Date(item[3] * 1000);
+                                                        let date = new Date(item[3]);
                                                         let hours = date.getHours();
                                                         let minutes = "0" + date.getMinutes();
                                                         let seconds = "0" + date.getSeconds();
