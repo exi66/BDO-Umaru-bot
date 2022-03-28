@@ -126,7 +126,7 @@ module.exports = {
 		}
 		var all_messages = [];
 		var filter = m => m.author.id === message.author.id;
-		await message.channel.send(lang.cmd.SELECT_REGION(client.umaru.regions.map(e => "• "+e.toUpperCase()).join("\n"))).then(m => all_messages.push(m));
+		await message.channel.send(lang.cmd.SELECT_REGION(client.umaru.regions.map(e => "• "+e.name.toUpperCase()).join("\n"))).then(m => all_messages.push(m));
 		let region_message = await message.channel.awaitMessages(filter, {
 			max: 1,
 			time: 240000,
@@ -135,7 +135,7 @@ module.exports = {
 			return message.channel.send(lang.global.TIMEOUT);
 		});
 		all_messages.push(region_message.first()); 
-		if (client.umaru.regions.includes(region_message.first().content.toLowerCase())) {
+		if (client.umaru.regions.map(e => e.name).includes(region_message.first().content.toLowerCase())) {
 			var local_region = region_message.first().content.toLowerCase();
 			await message.channel.send(lang.cmd.CREATE_AUTO(client.umaru.prefix)).then(m => all_messages.push(m));
 			let m = await message.channel.awaitMessages(filter, {
