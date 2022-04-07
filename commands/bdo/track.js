@@ -145,8 +145,8 @@ function addTracked(client, message, lang) {
 
             },
             after: (msg) => {
-                let enchant = parseInt(msg.content) || { error: add.ERROR_3 };
-                if (enchant.error) return enchant;
+                let enchant = parseInt(msg.content);
+                if (isNaN(enchant)) return { error: add.ERROR_3 };
                 return new_item.enchant = enchant;
             }
         },
