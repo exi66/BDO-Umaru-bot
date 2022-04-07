@@ -146,7 +146,7 @@ function addTracked(client, message, lang) {
             },
             after: (msg) => {
                 let enchant = parseInt(msg.content) || { error: add.ERROR_3 };
-                if (enchant.message) return enchant;
+                if (enchant.error) return enchant;
                 return new_item.enchant = enchant;
             }
         },
