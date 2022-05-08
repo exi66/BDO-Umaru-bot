@@ -102,11 +102,8 @@ module.exports = (client) => {
                                                         if (!mentions.includes(local_items["role"])) mentions += `<@&${local_items["role"]}>`;
                                                         lvls += item[1]+"\n";
                                                         names += item[4]+"\n";
-                                                        let date = new Date(item[3]);
-                                                        let hours = date.getHours();
-                                                        let minutes = "0" + date.getMinutes();
-                                                        let seconds = "0" + date.getSeconds();
-                                                        times += `${hours}:${minutes.substr(-2)}:${seconds.substr(-2)}\n`;													
+                                                        let date = (item[3]/1000).toFixed(0);
+                                                        times += `<t:${date}:R>\n`;
                                                     }										
                                                 }
                                             }
