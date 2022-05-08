@@ -9,7 +9,7 @@
   All valid coupons are taken from the [Orbit-games](https://orbit-games.com/) (ITS ONLY FOR RU REGION)  
 
 ## Setting on the discord server
-  The bot does not have a whitelist on the server, so if you want to use it for personal purposes on a public server, be sure to implement this check. This can be done in the `ready` and `guildCreate` methods.
+  The bot does not have a whitelist on the server, so if you want to use it for personal purposes on a public server, be sure to implement this check. This can be done in the `ready` and `guildCreate` methods or in discord developer settings.
 ### BDO
   Edit language with command `!config edit lang [ru | en]`.  
   The most basic functionality is available immediately with the `!start` command.   
