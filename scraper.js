@@ -32,7 +32,6 @@ module.exports = (client) => {
                                 if (!coupons_list.includes(c.toUpperCase())) new_coupones_list.push(c.toUpperCase());
                             }							
                             if (new_coupones_list.length > 0) {
-                                client.setCoupons(all_coupones_list);
                                 let codes = new_coupones_list.map(e => "`" + e + "`").join("\n");
                                 let coupons_configurations_list = configurations_list.filter(g => g.umaru.coupons);
                                 for (let local_guild of coupons_configurations_list) {						
@@ -54,6 +53,7 @@ module.exports = (client) => {
                                     }
                                 }							
                             }
+							client.setCoupons(all_coupones_list);
                         }
                     }).catch(function(e) { printError(error_here, "coupons request error, "+e.message) });
                 }
