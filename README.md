@@ -1,4 +1,6 @@
 # bdo-umaru-bot
+## Support has been suspended. The project has been migrated to a [newer version](https://github.com/exi66/bdo-market-wait-list)
+
 ## Discord.js bot for scraping black desert market queue and coupons
   Сurrently cupons scraping support only russian region
 
